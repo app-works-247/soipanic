@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trung Tâm Hỗ Trợ Kỹ Thuật | Support - SoiPanic</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Trung tâm hỗ trợ kỹ thuật và hướng dẫn sử dụng ứng dụng SoiPanic. Giải đáp thắc mắc về trích xuất log panic full, báo lỗi và phản hồi.">
+  <meta name="robots" content="index, follow">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Ambient Light Effects -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+  <div class="ambient-grid"></div>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container navbar">
+      <a href="index.html" class="brand-logo">
+        <img src="assets/logo.svg" alt="SoiPanic Logo" class="brand-icon">
+        <span>Soi<span class="gradient-text">Panic</span></span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html#features">Tính năng</a></li>
+          <li><a href="index.html#demo">Demo trực tiếp</a></li>
+          <li><a href="support.html" class="active">Hỗ trợ kỹ thuật</a></li>
+          <li><a href="privacy.html">Quyền riêng tư</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="index.html" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.88rem;">
+          ← Quay lại Trang chủ
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="legal-container">
+      <div class="legal-header">
+        <h1>Trung Tâm Hỗ Trợ Kỹ Thuật</h1>
+        <p>Hướng dẫn sử dụng, giải đáp thắc mắc và liên hệ trợ giúp cho ứng dụng SoiPanic.</p>
+      </div>
+
+      <div class="legal-body">
+        <h2>1. Hướng Dẫn Trích Xuất File Panic Log Trên iPhone / iPad</h2>
+        <p>Để lấy tệp nhật ký lỗi trên máy khách hàng, thực hiện các bước sau:</p>
+        <ol>
+          <li>Mở <strong>Cài đặt (Settings)</strong> trên thiết bị.</li>
+          <li>Chọn <strong>Quyền riêng tư & Bảo mật (Privacy & Security)</strong>.</li>
+          <li>Cuộn xuống dưới cùng và chọn <strong>Phân tích & Cải tiến (Analytics & Improvements)</strong>.</li>
+          <li>Chọn <strong>Dữ liệu phân tích (Analytics Data)</strong>.</li>
+          <li>Tại thanh tìm kiếm trên cùng, gõ từ khóa <code>panic-full</code>.</li>
+          <li>Chọn tệp có mốc thời gian gần nhất với lần sập nguồn của máy.</li>
+          <li>Bấm vào tệp, bôi đen sao chép văn bản (hoặc bấm nút Chia sẻ để gửi qua AirDrop/Zalo sang máy kỹ thuật).</li>
+        </ol>
+
+        <h2>2. Cách Nhập Log Vào Ứng Dụng SoiPanic</h2>
+        <p>SoiPanic hỗ trợ 4 phương thức nhập liệu thuận tiện nhất:</p>
+        <ul>
+          <li><strong>Dán văn bản (Paste):</strong> Dán trực tiếp chuỗi ký tự đã sao chép.</li>
+          <li><strong>Nhập tệp (.ips / .panic):</strong> Bấm "Chọn tệp nhật ký" và chọn file từ ứng dụng Tệp (Files).</li>
+          <li><strong>Quét Camera OCR:</strong> Hướng camera vào màn hình máy chứa log hoặc chụp ảnh màn hình để máy tự quét chuỗi mã lỗi.</li>
+          <li><strong>Tra cứu mã lỗi nhanh:</strong> Nhập trực tiếp tên bus (ví dụ: <code>i2c3</code>), tên cảm biến (ví dụ: <code>prs0</code>) hoặc mã hex để xem sơ đồ linh kiện.</li>
+        </ul>
+
+        <h2>3. Báo Cáo Sự Cố & Đóng Góp Ý Kiến</h2>
+        <p>
+          Nếu bạn phát hiện một mã lỗi panic mới chưa có trong cơ sở dữ liệu hoặc cần hỗ trợ kỹ thuật khẩn cấp, xin vui lòng gửi thông tin cho đội ngũ phát triển:
+        </p>
+        <ul>
+          <li>📧 <strong>Email hỗ trợ trực tiếp:</strong> <a href="mailto:daovansonbg@gmail.com" style="color: var(--cyan);">daovansonbg@gmail.com</a></li>
+          <li>🌐 <strong>Báo lỗi qua GitHub Issues:</strong> <a href="https://github.com/app-works-247/soipanic/issues" target="_blank" rel="noopener" style="color: var(--cyan);">github.com/app-works-247/soipanic/issues</a></li>
+        </ul>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+          <em>Thời gian phản hồi thông thường: Trong vòng 24 giờ làm việc.</em>
+        </p>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container" style="text-align: center;">
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        © 2026 SoiPanic. All rights reserved. • <a href="index.html" style="color: var(--cyan);">Trang chủ</a> • <a href="privacy.html" style="color: var(--cyan);">Chính sách quyền riêng tư</a>
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

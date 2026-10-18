@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chính Sách Quyền Riêng Tư | Privacy Policy - SoiPanic</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Chính sách quyền riêng tư của ứng dụng SoiPanic. Cam kết bảo vệ dữ liệu khách hàng, xử lý ngoại tuyến và không thu thập thông tin định danh cá nhân.">
+  <meta name="robots" content="index, follow">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .lang-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border-glass);
+      padding-bottom: 14px;
+    }
+    .lang-tab-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-size: 0.88rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .lang-tab-btn:hover, .lang-tab-btn.active {
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--cyan);
+      color: var(--text-primary);
+    }
+    .policy-content-section {
+      display: none;
+    }
+    .policy-content-section.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Light Effects -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+  <div class="ambient-grid"></div>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container navbar">
+      <a href="index.html" class="brand-logo">
+        <img src="assets/logo.svg" alt="SoiPanic Logo" class="brand-icon">
+        <span>Soi<span class="gradient-text">Panic</span></span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html#features">Tính năng</a></li>
+          <li><a href="index.html#demo">Demo trực tiếp</a></li>
+          <li><a href="support.html">Hỗ trợ kỹ thuật</a></li>
+          <li><a href="privacy.html" class="active">Quyền riêng tư</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="index.html" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.88rem;">
+          ← Quay lại Trang chủ
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <article class="legal-container">
+      <div class="legal-header">
+        <h1>Chính Sách Quyền Riêng Tư</h1>
+        <p>Cập nhật lần cuối: 18 tháng 10 năm 2026 • Phiên bản 1.0.0</p>
+      </div>
+
+      <!-- Language Switcher Tabs for App Review & Global Users -->
+      <div class="lang-tabs">
+        <button class="lang-tab-btn active" onclick="switchPolicyTab('vi')">🇻🇳 Tiếng Việt</button>
+        <button class="lang-tab-btn" onclick="switchPolicyTab('ja')">🇯🇵 日本語</button>
+        <button class="lang-tab-btn" onclick="switchPolicyTab('ko')">🇰🇷 한국어</button>
+        <button class="lang-tab-btn" onclick="switchPolicyTab('en')">🇺🇸 English</button>
+      </div>
+
+      <div class="legal-body">
+
+        <!-- Vietnamese Version -->
+        <div id="policy-vi" class="policy-content-section active">
+          <p>
+            Chào mừng bạn đến với <strong>SoiPanic</strong> ("chúng tôi", "ứng dụng"). Chúng tôi cam kết bảo vệ quyền riêng tư và dữ liệu cá nhân của người dùng cũng như khách hàng của bạn. Chính sách này giải thích cách thức ứng dụng xử lý dữ liệu khi bạn sử dụng dịch vụ chẩn đoán nhật ký lỗi trên iOS.
+          </p>
+
+          <h2>1. Triết Lý Thiết Kế Ưu Tiên Ngoại Tuyến (Offline-First)</h2>
+          <p>
+            SoiPanic được thiết kế nhằm phục vụ kỹ thuật viên sửa chữa phần cứng điện thoại di động:
+          </p>
+          <ul>
+            <li>Toàn bộ bộ máy phân tích cú pháp (Parser) và luật chẩn đoán lỗi (Rule Engine) chạy trực tiếp trên thiết bị của bạn.</li>
+            <li>Ứng dụng <strong>không yêu cầu kết nối mạng</strong> để thực hiện các thao tác quét OCR, dán log, tra cứu mã lỗi hay lưu trữ ca sửa chữa.</li>
+          </ul>
+
+          <h2>2. Tự Động Làm Sạch Dữ Liệu Nhạy Cảm (Log Sanitization)</h2>
+          <p>
+            Trong các tệp nhật ký hệ thống (kernel panic log) của Apple thường có thể chứa các thông tin liên quan đến định danh phần cứng. SoiPanic tích hợp sẵn cơ chế khử khuẩn dữ liệu tự động (Sanitizer):
+          </p>
+          <ul>
+            <li>Tự động loại bỏ hoặc ẩn (masking) các chuỗi số Serial Number, IMEI, UDID, ECID của thiết bị trước khi hiển thị hoặc lưu trữ.</li>
+            <li>Chúng tôi <strong>không bao giờ</strong> trích xuất, lưu trữ hay chia sẻ thông tin cá nhân của chủ sở hữu điện thoại (như tên, danh bạ, ảnh, email, tin nhắn).</li>
+          </ul>
+
+          <h2>3. Dữ Liệu Chúng Tôi Thu Thập (Nếu Có)</h2>
+          <p>
+            SoiPanic tuân thủ nghiêm ngặt chuẩn mực về dữ liệu của Apple App Store:
+          </p>
+          <ul>
+            <li><strong>Dữ liệu không liên kết với danh tính của bạn (Data Not Linked to You):</strong> Nếu bạn chủ động bấm gửi "Phản hồi độ chính xác" cho một ca chẩn đoán, ứng dụng chỉ gửi chuỗi mã lỗi kỹ thuật ẩn danh và đánh giá mức độ đúng/sai để cải thiện bộ luật.</li>
+            <li><strong>Không sử dụng để theo dõi (No Tracking):</strong> Chúng tôi không sử dụng bất kỳ thư viện quảng cáo hay công cụ theo dõi hành vi liên ứng dụng nào (Không dùng IDFA).</li>
+          </ul>
+
+          <h2>4. Quyền Truy Cập Thiết Bị</h2>
+          <p>Ứng dụng chỉ yêu cầu các quyền thực sự cần thiết cho tính năng:</p>
+          <ul>
+            <li><strong>Camera:</strong> Chỉ kích hoạt khi bạn sử dụng tính năng quét mã OCR để nhận diện chữ trên màn hình log. Hình ảnh chụp được xử lý trực tiếp trên RAM bằng Apple Vision Framework và không bị lưu trữ hay tải lên máy chủ.</li>
+            <li><strong>Truy cập Tệp (File Access):</strong> Dùng để mở tệp log định dạng <code>.ips</code> hoặc <code>.panic</code> mà bạn chủ động chọn từ ứng dụng Files.</li>
+          </ul>
+
+          <h2>5. Quyền Của Người Dùng & Lưu Trữ Dữ Liệu</h2>
+          <p>
+            Mọi hồ sơ sửa chữa (Cases) và lịch sử chẩn đoán được lưu trên bộ nhớ cục bộ của máy (Local Storage) thông qua cơ chế mã hóa của hệ điều hành iOS. Bạn có toàn quyền xem, chỉnh sửa hoặc xóa vĩnh viễn các hồ sơ này bất kỳ lúc nào ngay trong mục Cài đặt của ứng dụng.
+          </p>
+
+          <h2>6. Liên Hệ Với Chúng Tôi</h2>
+          <p>
+            Nếu bạn có bất kỳ thắc mắc hoặc yêu cầu nào liên quan đến chính sách quyền riêng tư này, vui lòng liên hệ qua email:
+          </p>
+          <p>
+            📧 <strong>Email hỗ trợ:</strong> <a href="mailto:daovansonbg@gmail.com" style="color: var(--cyan);">daovansonbg@gmail.com</a><br>
+            🌐 <strong>Kho mã nguồn:</strong> <a href="https://github.com/app-works-247/soipanic" target="_blank" rel="noopener" style="color: var(--cyan);">github.com/app-works-247/soipanic</a>
+          </p>
+        </div>
+
+        <!-- Japanese Version -->
+        <div id="policy-ja" class="policy-content-section">
+          <p>
+            <strong>SoiPanic</strong>（以下「本アプリ」）は、ユーザーおよびエンドユーザーのプライバシー保護を最優先事項として設計されています。本プライバシーポリシーでは、本アプリがどのようにデータを処理するかをご説明します。
+          </p>
+
+          <h2>1. ローカル処理・オフライン設計方針</h2>
+          <ul>
+            <li>本アプリのカーネルパニックログ構文解析およびハードウェア障害ルールエンジンは、お客様の端末（iOS端末）上で完全にオフラインで動作します。</li>
+            <li>パニックログの分析、OCR文字認識、ハードウェア検索を実行する際に、外部サーバーへの通信は発生しません。</li>
+          </ul>
+
+          <h2>2. 機密情報の自動マスキング（サニタイズ）</h2>
+          <ul>
+            <li>パニックログ内に含まれ得る端末固有の識別情報（シリアル番号、UDID、IMEIなど）は、アプリ内部のサニタイザー機能により自動的にマスキング・削除されます。</li>
+            <li>お客様の個人情報（氏名、連絡先、写真、メッセージ等）を取得・保存・共有することは一切ありません。</li>
+          </ul>
+
+          <h2>3. 収集されるデータ（該当する場合）</h2>
+          <ul>
+            <li><strong>個人と紐付けられないデータ：</strong> 診断精度向上のためにユーザーが任意でフィードバックを送信した場合にのみ、匿名の障害コードと正誤判定データが送信されます。</li>
+            <li><strong>トラッキングの不使用：</strong> 本アプリはIDFAなどの広告識別子を利用したトラッキングを行いません。</li>
+          </ul>
+
+          <h2>4. デバイスへのアクセス権限</h2>
+          <ul>
+            <li><strong>カメラ権限：</strong> パニックログ画面のOCR読み取り機能でのみ使用されます。画像は端末内でVisionフレームワークによりリアルタイム処理され、外部送信されません。</li>
+          </ul>
+
+          <h2>5. お問い合わせ</h2>
+          <p>
+            プライバシーに関するお問い合わせは、下記までご連絡ください。<br>
+            📧 Eメール：<a href="mailto:daovansonbg@gmail.com" style="color: var(--cyan);">daovansonbg@gmail.com</a>
+          </p>
+        </div>
+
+        <!-- Korean Version -->
+        <div id="policy-ko" class="policy-content-section">
+          <p>
+            <strong>SoiPanic</strong>(이하 "본 앱")은 사용자의 개인정보와 고객 데이터를 소중히 보호하며, Apple의 App Store 개인정보 보호 가이드라인을 철저히 준수합니다.
+          </p>
+
+          <h2>1. 오프라인 우선 설계 (Offline-First)</h2>
+          <ul>
+            <li>패닉 로그 분석 및 고장 진단 규칙 엔진은 사용자의 기기 내에서 100% 로컬로 작동합니다.</li>
+            <li>인터넷 연결 없이도 로그 분석, OCR 문자 인식, 하드웨어 회로 검색 기능이 원활히 실행됩니다.</li>
+          </ul>
+
+          <h2>2. 기기 식별 정보의 자동 비식별화 (Sanitization)</h2>
+          <ul>
+            <li>로그 내에 포함될 수 있는 일련번호(Serial Number), IMEI, UDID 등 기기 고유 식별자는 내부 필터를 통해 자동으로 마스킹 처리됩니다.</li>
+            <li>사용자의 이름, 연락처, 사진 등 개인 데이터를 일체 수집하거나 전송하지 않습니다.</li>
+          </ul>
+
+          <h2>3. 데이터 수집 및 추적 금지</h2>
+          <ul>
+            <li><strong>식별되지 않는 진단 데이터:</strong> 진단 정확도 피드백을 자발적으로 제출할 때에만 익명화된 오류 코드 및 평가 결과가 전송됩니다.</li>
+            <li><strong>추적(Tracking) 없음:</strong> 본 앱은 광고 목적의 추적이나 서드파티 광고 라이브러리를 포함하지 않습니다.</li>
+          </ul>
+
+          <h2>4. 문의처</h2>
+          <p>
+            개인정보 보호와 관련된 문의사항은 아래 연락처로 문의해 주시기 바랍니다.<br>
+            📧 이메일: <a href="mailto:daovansonbg@gmail.com" style="color: var(--cyan);">daovansonbg@gmail.com</a>
+          </p>
+        </div>
+
+        <!-- English Version -->
+        <div id="policy-en" class="policy-content-section">
+          <p>
+            Welcome to <strong>SoiPanic</strong> ("we", "our", or "the App"). We are committed to protecting user privacy and ensuring transparent data practices in compliance with Apple App Store Review Guideline 5.1.1.
+          </p>
+
+          <h2>1. Offline-First Architecture</h2>
+          <ul>
+            <li>All kernel panic log parsing, bitmask rule matching, and hardware component lookups execute locally on your iOS device.</li>
+            <li>Core diagnostics function completely without requiring an internet connection.</li>
+          </ul>
+
+          <h2>2. Automatic Log Sanitization</h2>
+          <ul>
+            <li>System crash logs may contain hardware IDs. SoiPanic automatically strips out or masks serial numbers, IMEIs, and device UDIDs before parsing or storing.</li>
+            <li>We do not access or collect personal data such as names, photos, contacts, or messages.</li>
+          </ul>
+
+          <h2>3. Data Collection & Tracking</h2>
+          <ul>
+            <li><strong>Data Not Linked to You:</strong> If you voluntarily submit diagnostic accuracy feedback, only anonymous error signatures and rating flags are transmitted to improve rule accuracy.</li>
+            <li><strong>No Tracking:</strong> We do not track users across other apps or websites, and we do not use advertising identifiers (IDFA).</li>
+          </ul>
+
+          <h2>4. Device Permissions</h2>
+          <ul>
+            <li><strong>Camera:</strong> Used exclusively for on-device OCR scanning of panic log text from screen captures via Apple's Vision framework. Images are never uploaded.</li>
+            <li><strong>Files Access:</strong> Used solely to open <code>.ips</code> and <code>.panic</code> files selected by the user.</li>
+          </ul>
+
+          <h2>5. Contact Information</h2>
+          <p>
+            If you have questions regarding this Privacy Policy, please contact us at:<br>
+            📧 Email: <a href="mailto:daovansonbg@gmail.com" style="color: var(--cyan);">daovansonbg@gmail.com</a>
+          </p>
+        </div>
+
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container" style="text-align: center;">
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        © 2026 SoiPanic. All rights reserved. • <a href="index.html" style="color: var(--cyan);">Trang chủ</a> • <a href="support.html" style="color: var(--cyan);">Hỗ trợ</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    function switchPolicyTab(lang) {
+      document.querySelectorAll('.lang-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.policy-content-section').forEach(sec => sec.classList.remove('active'));
+
+      event.target.classList.add('active');
+      const targetSec = document.getElementById('policy-' + lang);
+      if (targetSec) targetSec.classList.add('active');
+    }
+  </script>
+</body>
+</html>
