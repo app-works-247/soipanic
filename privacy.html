@@ -93,7 +93,7 @@
     <article class="legal-container">
       <div class="legal-header">
         <h1>Chính Sách Quyền Riêng Tư</h1>
-        <p>Cập nhật lần cuối: 18 tháng 10 năm 2026 • Phiên bản 1.0.0</p>
+        <p>Cập nhật lần cuối: 10 tháng 11 năm 2026 • Phiên bản 1.0.0</p>
       </div>
 
       <!-- Language Switcher Tabs for App Review & Global Users -->
@@ -135,7 +135,9 @@
             SoiPanic tuân thủ nghiêm ngặt chuẩn mực về dữ liệu của Apple App Store:
           </p>
           <ul>
-            <li><strong>Dữ liệu không liên kết với danh tính của bạn (Data Not Linked to You):</strong> Nếu bạn chủ động bấm gửi "Phản hồi độ chính xác" cho một ca chẩn đoán, ứng dụng chỉ gửi chuỗi mã lỗi kỹ thuật ẩn danh và đánh giá mức độ đúng/sai để cải thiện bộ luật.</li>
+            <li><strong>Dữ liệu không liên kết với danh tính của bạn (Data Not Linked to You):</strong> Nếu bạn chủ động bấm gửi "Phản hồi độ chính xác" cho một ca chẩn đoán, ứng dụng gửi mã lỗi kỹ thuật, model máy, đánh giá đúng/sai và ghi chú bạn tự nhập (nếu có) để cải thiện bộ luật.</li>
+            <li><strong>Chia sẻ ca sửa (tuỳ chọn):</strong> Khi bạn chủ động chia sẻ một ca sửa, ứng dụng gửi model máy, đoạn trích log đã ẩn thông tin định danh, linh kiện đã thay và ghi chú của bạn lên máy chủ của SoiPanic (Supabase).</li>
+            <li><strong>Giải thích bằng AI (tuỳ chọn):</strong> Tính năng chỉ chạy khi bạn bấm "Hỏi AI Chuyên Sâu" và đồng ý trong hộp thoại xin phép. Ứng dụng gửi model máy, mã lỗi, danh sách linh kiện nghi lỗi và tối đa 300 ký tự log đã ẩn Serial, IMEI, ECID, email qua máy chủ SoiPanic tới <strong>OpenAI</strong> để tạo phần giải thích. Máy chủ SoiPanic không lưu nội dung này; OpenAI xử lý theo chính sách dữ liệu API của OpenAI. Log gốc không bao giờ được gửi. Bạn có thể tắt tính năng này trong Cài đặt.</li>
             <li><strong>Không sử dụng để theo dõi (No Tracking):</strong> Chúng tôi không sử dụng bất kỳ thư viện quảng cáo hay công cụ theo dõi hành vi liên ứng dụng nào (Không dùng IDFA).</li>
           </ul>
 
@@ -181,7 +183,9 @@
 
           <h2>3. 収集されるデータ（該当する場合）</h2>
           <ul>
-            <li><strong>個人と紐付けられないデータ：</strong> 診断精度向上のためにユーザーが任意でフィードバックを送信した場合にのみ、匿名の障害コードと正誤判定データが送信されます。</li>
+            <li><strong>個人と紐付けられないデータ：</strong> 診断精度向上のためにユーザーが任意でフィードバックを送信した場合にのみ、障害コード、機種、正誤判定、ユーザーが入力したメモ（任意）が送信されます。</li>
+            <li><strong>修理事例の共有（任意）：</strong> 修理事例を共有した場合、機種、識別情報を除去したログ抜粋、交換部品、メモがSoiPanicのサーバー（Supabase）に送信されます。</li>
+            <li><strong>AI解説（任意）：</strong> 「AIに詳細を聞く」を押し、確認ダイアログで許可した場合のみ動作します。機種、エラーコード、疑わしい部品、シリアル番号・IMEI・ECID・メールアドレスを除去したログ最大300文字が、SoiPanicサーバー経由で<strong>OpenAI</strong>に送信され、解説が生成されます。SoiPanicサーバーはこの内容を保存せず、OpenAIはOpenAIのAPIデータポリシーに従って処理します。元のログは送信されません。この機能は設定でオフにできます。</li>
             <li><strong>トラッキングの不使用：</strong> 本アプリはIDFAなどの広告識別子を利用したトラッキングを行いません。</li>
           </ul>
 
@@ -217,7 +221,9 @@
 
           <h2>3. 데이터 수집 및 추적 금지</h2>
           <ul>
-            <li><strong>식별되지 않는 진단 데이터:</strong> 진단 정확도 피드백을 자발적으로 제출할 때에만 익명화된 오류 코드 및 평가 결과가 전송됩니다.</li>
+            <li><strong>식별되지 않는 진단 데이터:</strong> 진단 정확도 피드백을 자발적으로 제출할 때에만 오류 코드, 기기 모델, 평가 결과 및 사용자가 입력한 메모(선택)가 전송됩니다.</li>
+            <li><strong>수리 사례 공유(선택):</strong> 수리 사례를 공유하면 기기 모델, 식별 정보를 제거한 로그 일부, 교체 부품, 메모가 SoiPanic 서버(Supabase)로 전송됩니다.</li>
+            <li><strong>AI 설명(선택):</strong> "AI 정밀 분석"을 누르고 확인 창에서 허용한 경우에만 작동합니다. 기기 모델, 오류 코드, 의심 부품, 시리얼·IMEI·ECID·이메일을 제거한 최대 300자의 로그가 SoiPanic 서버를 거쳐 <strong>OpenAI</strong>로 전송되어 설명을 생성합니다. SoiPanic 서버는 이 내용을 저장하지 않으며, OpenAI는 OpenAI API 데이터 정책에 따라 처리합니다. 원본 로그는 전송되지 않습니다. 설정에서 이 기능을 끌 수 있습니다.</li>
             <li><strong>추적(Tracking) 없음:</strong> 본 앱은 광고 목적의 추적이나 서드파티 광고 라이브러리를 포함하지 않습니다.</li>
           </ul>
 
@@ -248,7 +254,9 @@
 
           <h2>3. Data Collection & Tracking</h2>
           <ul>
-            <li><strong>Data Not Linked to You:</strong> If you voluntarily submit diagnostic accuracy feedback, only anonymous error signatures and rating flags are transmitted to improve rule accuracy.</li>
+            <li><strong>Data Not Linked to You:</strong> If you voluntarily submit diagnostic accuracy feedback, the app sends the error signature, device model, your rating and any notes you type, to improve rule accuracy.</li>
+            <li><strong>Case sharing (optional):</strong> If you choose to share a repair case, the app sends the device model, a log excerpt with identifiers removed, the replaced part and your notes to the SoiPanic server (Supabase).</li>
+            <li><strong>AI explanation (optional):</strong> This runs only after you tap "Ask AI for Details" and allow it in the permission dialog. The app sends the device model, error code, suspected components and up to 300 characters of the log, with serial number, IMEI, ECID and email removed, through the SoiPanic server to <strong>OpenAI</strong> to generate the explanation. The SoiPanic server does not store this content; OpenAI processes it under its API data usage policies. The original log is never sent. You can turn this feature off in Settings.</li>
             <li><strong>No Tracking:</strong> We do not track users across other apps or websites, and we do not use advertising identifiers (IDFA).</li>
           </ul>
 
