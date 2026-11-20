@@ -27,36 +27,6 @@ assets/
 
 Trang chủ hỗ trợ bốn ngôn ngữ. Nội dung tiếng Việt viết thẳng trong `index.html`; bản tiếng Anh, Nhật, Hàn nằm trong object `T` ở `js/main.js`. Khi sửa chữ trên trang, sửa cả hai chỗ.
 
-Demo trên web chỉ nhận ra ba mẫu lỗi khai báo trong `SAMPLES` (`js/main.js`). Nó không dùng bộ luật thật của ứng dụng.
-
-## Chạy thử trên máy
-
-Không cần build. Mở thẳng `index.html`, hoặc chạy một server tĩnh:
-
-```sh
-python3 -m http.server 8000
-```
-
-rồi vào http://localhost:8000.
-
-## Cập nhật ảnh chụp trên trang chủ
-
-Ảnh trong `assets/web/` được tạo từ `assets/screenshots/iphone_6.3/<ngôn ngữ>/raw_screenshot_<n>.png`. Trang chủ dùng ảnh số 1, 2, 4 và 5. Sau khi thay ảnh gốc, tạo lại bằng:
-
-```sh
-for l in vi en ja ko; do
-  for i in 1 2 4 5; do
-    sips -s format jpeg -s formatOptions 78 -Z 1160 \
-      assets/screenshots/iphone_6.3/$l/raw_screenshot_$i.png \
-      --out assets/web/app-$l-$i.jpg
-  done
-done
-```
-
-## Triển khai
-
-GitHub Pages lấy từ nhánh `main`, thư mục gốc (Settings › Pages › Deploy from a branch). Push lên `main` là trang tự cập nhật sau một hai phút.
-
 ## Liên hệ
 
 daovansonbg@gmail.com
