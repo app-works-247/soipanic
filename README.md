@@ -1,46 +1,62 @@
-# SoiPanic - Landing Page & Legal Documentation
+# SoiPanic – website
 
-Trang giới thiệu chính thức (Landing Page), Chính sách quyền riêng tư (Privacy Policy) và Trung tâm hỗ trợ kỹ thuật (Support Center) cho ứng dụng di động **SoiPanic** (iOS Panic Full & Hardware Fault Diagnoser).
+Trang giới thiệu, trang hỗ trợ và chính sách quyền riêng tư của SoiPanic, ứng dụng iOS đọc log panic-full để khoanh vùng linh kiện lỗi trên iPhone.
 
-## 🌐 Các Đường Dẫn Phục Vụ Nộp App Store Connect (GitHub Pages)
+Ứng dụng trên App Store: https://apps.apple.com/app/id6824146332
 
-Khi cấu hình GitHub Pages từ nhánh `main` (root):
+Website chạy trên GitHub Pages:
 
-- **Trang chủ (Landing Page):** `https://app-works-247.github.io/soipanic/`
-- **Chính sách quyền riêng tư (Privacy Policy URL):** `https://app-works-247.github.io/soipanic/privacy.html`
-- **URL Hỗ trợ kỹ thuật (Support URL):** `https://app-works-247.github.io/soipanic/support.html`
+- Trang chủ: https://app-works-247.github.io/soipanic/
+- Hỗ trợ (Support URL trên App Store Connect): https://app-works-247.github.io/soipanic/support.html
+- Quyền riêng tư (Privacy Policy URL): https://app-works-247.github.io/soipanic/privacy.html
 
----
+Nếu đổi tên hay đường dẫn hai trang hỗ trợ và quyền riêng tư, nhớ cập nhật lại trong App Store Connect.
 
-## 🚀 Tính Năng Trang Web
-- **Thiết kế phong cách Dark Mode & Glassmorphism cao cấp:** Tương thích chuẩn thẩm mỹ Apple iOS.
-- **Hỗ trợ đa ngôn ngữ đầy đủ:** Tiếng Việt (vi), Tiếng Nhật (ja), Tiếng Hàn (ko), Tiếng Anh (en).
-- **Trình giả lập phân tích Panic Log trực tiếp:** Cho phép khách truy cập và Apple Reviewer trải nghiệm thử thuật toán phân tích log ngay trên trình duyệt với 3 ca bệnh mẫu thực tế.
-- **Tối ưu SEO & Tương thích di động:** Tải trang nhanh, chuẩn thẻ OpenGraph và cấu trúc ngữ nghĩa HTML5.
-- **Chính sách riêng tư chuẩn mực:** Đáp ứng đầy đủ tiêu chuẩn Apple App Store Review Guideline 5.1.1.
+## Cấu trúc
 
----
-
-## 📂 Cấu Trúc Thư Mục
 ```text
-soipanic/
-├── index.html        # Trang chủ / Landing page & Live Demo
-├── privacy.html      # Chính sách quyền riêng tư (Đa ngôn ngữ VI, JA, KO, EN)
-├── support.html      # Trang hỗ trợ kỹ thuật & hướng dẫn lấy log
-├── css/
-│   └── style.css     # CSS thuần hiện đại, Glassmorphism & Responsive
-├── js/
-│   └── main.js       # Bộ chuyển đổi ngôn ngữ & Trình phân tích log demo
-└── assets/
-    ├── logo.svg      # Logo vector chuẩn nét cao
-    └── favicon.svg   # Favicon trình duyệt
+index.html      trang chủ, có bản demo phân tích log chạy trên trình duyệt
+support.html    cách lấy log, cách nhập log, liên hệ
+privacy.html    chính sách quyền riêng tư (vi, ja, ko, en)
+css/style.css   style dùng chung cho cả ba trang
+js/main.js      đổi ngôn ngữ, demo, menu trên điện thoại
+assets/
+  web/          ảnh đã nén dùng trên website (icon, ảnh chụp app theo từng ngôn ngữ)
+  screenshots/  ảnh gốc nộp App Store: iphone_6.3 và ipad_13, mỗi ngôn ngữ một thư mục
 ```
 
----
+Trang chủ hỗ trợ bốn ngôn ngữ. Nội dung tiếng Việt viết thẳng trong `index.html`; bản tiếng Anh, Nhật, Hàn nằm trong object `T` ở `js/main.js`. Khi sửa chữ trên trang, sửa cả hai chỗ.
 
-## 🛠️ Hướng Dẫn Kích Hoạt GitHub Pages
-1. Vào repository **[app-works-247/soipanic](https://github.com/app-works-247/soipanic)** trên GitHub.
-2. Chọn tab **Settings** > **Pages** (ở cột bên trái).
-3. Tại mục **Build and deployment > Source**, chọn **Deploy from a branch**.
-4. Chọn nhánh **main** và thư mục **/ (root)**, sau đó nhấn **Save**.
-5. Đợi 1-2 phút, GitHub Pages sẽ kích hoạt tại địa chỉ: `https://app-works-247.github.io/soipanic/`.
+Demo trên web chỉ nhận ra ba mẫu lỗi khai báo trong `SAMPLES` (`js/main.js`). Nó không dùng bộ luật thật của ứng dụng.
+
+## Chạy thử trên máy
+
+Không cần build. Mở thẳng `index.html`, hoặc chạy một server tĩnh:
+
+```sh
+python3 -m http.server 8000
+```
+
+rồi vào http://localhost:8000.
+
+## Cập nhật ảnh chụp trên trang chủ
+
+Ảnh trong `assets/web/` được tạo từ `assets/screenshots/iphone_6.3/<ngôn ngữ>/raw_screenshot_<n>.png`. Trang chủ dùng ảnh số 1, 2, 4 và 5. Sau khi thay ảnh gốc, tạo lại bằng:
+
+```sh
+for l in vi en ja ko; do
+  for i in 1 2 4 5; do
+    sips -s format jpeg -s formatOptions 78 -Z 1160 \
+      assets/screenshots/iphone_6.3/$l/raw_screenshot_$i.png \
+      --out assets/web/app-$l-$i.jpg
+  done
+done
+```
+
+## Triển khai
+
+GitHub Pages lấy từ nhánh `main`, thư mục gốc (Settings › Pages › Deploy from a branch). Push lên `main` là trang tự cập nhật sau một hai phút.
+
+## Liên hệ
+
+daovansonbg@gmail.com

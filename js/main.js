@@ -1,16 +1,13 @@
-/**
- * SoiPanic Landing Page & Demo Controller
- * Multi-language support (VI, JA, KO, EN), Live Interactive Analyzer Demo & UI Interactivity
- */
-
+// SoiPanic landing page: language switch, web demo, mobile nav.
 (function () {
   'use strict';
 
-  // --- Real-world Sample Logs for Demo ---
-  const DEMO_SAMPLES = {
+  // ---------- demo samples ----------
+  const SAMPLES = {
     sample1: {
-      name: "iPhone 11 - I2C3 SDB Error",
-      device: "iPhone 11 (iPhone12,1)",
+      file: 'panic-full-2026-10-18-101523.ips',
+      match: /i2c3|\bsdb\b/i,
+      nets: ['I2C3_SDA', 'I2C3_SCL', 'J6400'],
       text: `{"bug_type":"210","timestamp":"2026-10-18 10:15:23.00 +0700","os_version":"iPhone OS 17.5.1 (21F90)"}
 {
   "build" : "iPhone OS 17.5.1 (21F90)",
@@ -21,42 +18,56 @@
 }`,
       result: {
         vi: {
-          suspect: "Cáp sạc / NTC nhiệt độ & Bus I2C3",
-          confidence: "94% (Rất cao)",
-          device: "iPhone 11 (A2111 / A2221)",
-          reason: "Bus I2C3 bị treo do timeout thiết bị ngoại vi SDB không phản hồi sau chu kỳ bật nguồn.",
-          evidence: "i2c3::_checkWlanStatus SDB wlan pwr on fail, timeout waiting for bus ready",
-          safeSteps: "1. Thử cách ly cụm cáp sạc và micro đáy.\\n2. Đo tổng trở đường I2C3_SDA và I2C3_SCL tại socket J6400.\\n3. Kiểm tra trở kháng nhiệt NTC trên cáp trước khi can thiệp IC sạc/mainboard."
-        },
-        ja: {
-          suspect: "ドックコネクタ / NTCサーミスタ & I2C3バス",
-          confidence: "94% (非常に高い)",
-          device: "iPhone 11 (iPhone12,1)",
-          reason: "SDBペリフェラルが応答しないためI2C3バスがタイムアウトし、カーネルパニックが発生しました。",
-          evidence: "i2c3::_checkWlanStatus SDB wlan pwr on fail, timeout waiting for bus ready",
-          safeSteps: "1. ドックフレックスケーブル（充電コネクタ）を外して再起動確認。\\n2. ソケットJ6400のI2C3_SDAおよびI2C3_SCLラインのダイオード値を測定。\\n3. 基板作業の前に外付けパーツの不良を切り分けてください。"
-        },
-        ko: {
-          suspect: "충전 독 플렉스 / NTC 온도 센서 및 I2C3 버스",
-          confidence: "94% (매우 높음)",
-          device: "iPhone 11 (iPhone12,1)",
-          reason: "SDB 외장 장치 응답 지연으로 인해 I2C3 버스 통신 타임아웃 발생.",
-          evidence: "i2c3::_checkWlanStatus SDB wlan pwr on fail, timeout waiting for bus ready",
-          safeSteps: "1. 하단 충전 독 케이블 분리 후 재부팅 테스트.\\n2. 소켓 J6400의 I2C3_SDA / SCL 라인 저항값(다이오드 모드) 실측.\\n3. 메인보드 작업 전 케이블 부품 교체 우선 권장."
+          suspect: 'Cáp sạc, NTC nhiệt độ và bus I2C3',
+          model: 'iPhone 11 (iPhone12,1)',
+          tag: 'Đã kiểm chứng',
+          reason: 'Bus I2C3 bị treo vì thiết bị SDB không phản hồi sau khi cấp nguồn.',
+          steps: [
+            'Tách cụm cáp sạc và mic đáy, khởi động lại để thử.',
+            'Đo trở kháng đường I2C3_SDA và I2C3_SCL tại socket J6400.',
+            'Kiểm tra NTC nhiệt độ trên cáp trước khi can thiệp IC sạc hay main.'
+          ]
         },
         en: {
-          suspect: "Charging Dock Flex / NTC Thermistor & I2C3 Bus",
-          confidence: "94% (Very High)",
-          device: "iPhone 11 (iPhone12,1)",
-          reason: "I2C3 bus hang detected due to SDB peripheral timeout during power initialization.",
-          evidence: "i2c3::_checkWlanStatus SDB wlan pwr on fail, timeout waiting for bus ready",
-          safeSteps: "1. Disconnect dock flex cable and test reboot.\\n2. Measure diode mode impedance on I2C3_SDA and I2C3_SCL lines at J6400.\\n3. Isolate peripheral flex cable before rework on board."
+          suspect: 'Charging flex, NTC thermistor and I2C3 bus',
+          model: 'iPhone 11 (iPhone12,1)',
+          tag: 'Verified',
+          reason: 'The I2C3 bus hung because the SDB peripheral did not respond after power-on.',
+          steps: [
+            'Disconnect the charging port flex and bottom mic, then reboot to test.',
+            'Measure resistance on I2C3_SDA and I2C3_SCL at socket J6400.',
+            'Check the NTC thermistor on the flex before working on the charging IC or board.'
+          ]
+        },
+        ja: {
+          suspect: 'ドックコネクタ、NTCサーミスタ、I2C3バス',
+          model: 'iPhone 11 (iPhone12,1)',
+          tag: '検証済み',
+          reason: '電源投入後にSDBペリフェラルが応答せず、I2C3バスがハングしました。',
+          steps: [
+            'ドックフレックスと下部マイクを外して再起動し、症状を確認。',
+            'ソケットJ6400でI2C3_SDAとI2C3_SCLの抵抗値を測定。',
+            '充電ICや基板に手を入れる前に、フレックス上のNTCサーミスタを確認。'
+          ]
+        },
+        ko: {
+          suspect: '충전 독 플렉스, NTC 온도 센서, I2C3 버스',
+          model: 'iPhone 11 (iPhone12,1)',
+          tag: '검증됨',
+          reason: '전원 인가 후 SDB 장치가 응답하지 않아 I2C3 버스가 멈췄습니다.',
+          steps: [
+            '충전 독 플렉스와 하단 마이크를 분리하고 재부팅해 확인합니다.',
+            '소켓 J6400에서 I2C3_SDA, I2C3_SCL 라인 저항을 측정합니다.',
+            '충전 IC나 보드 작업 전에 플렉스의 NTC 온도 센서를 점검합니다.'
+          ]
         }
       }
     },
+
     sample2: {
-      name: "iPhone 13 - Thermal PRS0 Error",
-      device: "iPhone 13 (iPhone14,5)",
+      file: 'panic-full-2026-10-18-112045.ips',
+      match: /prs0|thermal monitor/i,
+      nets: ['I2C_BARO_SDA', 'I2C_BARO_SCL', 'PP1V8_VA'],
       text: `{"bug_type":"210","timestamp":"2026-10-18 11:20:45.00 +0700","os_version":"iPhone OS 17.4 (21E219)"}
 {
   "build" : "iPhone OS 17.4 (21E219)",
@@ -66,43 +77,57 @@
 }`,
       result: {
         vi: {
-          suspect: "Cảm biến áp suất PRS0 / Cụm loa trong & Mic đỉnh",
-          confidence: "96% (Rất cao)",
-          device: "iPhone 13 (A2482 / A2633)",
-          reason: "Cảm biến nhiệt/áp kế PRS0 không phản hồi thông số định kỳ về bộ quản lý nhiệt hệ thống.",
-          evidence: "Thermal monitor: sensor prs0 failed to report temperature within expected interval",
-          safeSteps: "1. Cách ly dây loa trong (cụm cảm biến Face ID / Tiệm cận / Loa thoại).\\n2. Kiểm tra đường áp 1V8 cấp cho cảm biến áp kế.\\n3. Thay thế cụm cáp loa trong để kiểm tra hiện tượng sập nguồn 3 phút."
-        },
-        ja: {
-          suspect: "気圧センサーPRS0 / イヤースピーカー・近接フレックス",
-          confidence: "96% (非常に高い)",
-          device: "iPhone 13 (iPhone14,5)",
-          reason: "サーマルモニター監視下でPRS0気圧センサーからの温度定期レポートが途絶。",
-          evidence: "Thermal monitor: sensor prs0 failed to report temperature within expected interval",
-          safeSteps: "1. イヤースピーカー/近接センサーアセンブリを外して3分再起動を確認。\\n2. 気圧センサーへの1.8V電源供給ラインの短絡をチェック。\\n3. 画面側上部フレックスケーブルの交換テスト。"
-        },
-        ko: {
-          suspect: "기압 센서 PRS0 / 수화 스피커 & 근접 센서 플렉스",
-          confidence: "96% (매우 높음)",
-          device: "iPhone 13 (iPhone14,5)",
-          reason: "시스템 서멀 모니터에서 PRS0 기압 센서 응답 누락으로 3분 리셋 트리거.",
-          evidence: "Thermal monitor: sensor prs0 failed to report temperature within expected interval",
-          safeSteps: "1. 액정 상단 수화부 플렉스 케이블 분리 후 3분 꺼짐 여부 테스트.\\n2. 기압 센서 전원 라인(1.8V) 쇼트 점검.\\n3. 수화부 센서 케이블 교체 후 정상 동작 확인."
+          suspect: 'Cảm biến áp suất PRS0 trên cụm loa trong',
+          model: 'iPhone 13 (iPhone14,5)',
+          tag: 'Đã kiểm chứng',
+          reason: 'PRS0 không gửi nhiệt độ về bộ giám sát nhiệt đúng hạn, nên máy tự khởi động lại sau khoảng 3 phút.',
+          steps: [
+            'Tháo cụm loa trong (Face ID, cảm biến tiệm cận, loa thoại) và xem máy còn sập sau 3 phút không.',
+            'Đo đường áp 1V8 cấp cho cảm biến áp suất.',
+            'Thay thử cụm cáp loa trong khác.'
+          ]
         },
         en: {
-          suspect: "Barometer Sensor PRS0 / Earpiece Speaker & Proximity Flex",
-          confidence: "96% (Very High)",
-          device: "iPhone 13 (iPhone14,5)",
-          reason: "Thermal monitor timed out waiting for periodic report from prs0 pressure/temperature sensor.",
-          evidence: "Thermal monitor: sensor prs0 failed to report temperature within expected interval",
-          safeSteps: "1. Disconnect front earpiece/proximity assembly and verify 3-minute reboot.\\n2. Measure 1.8V power rail feeding barometer sensor.\\n3. Replace upper flex cable assembly."
+          suspect: 'PRS0 pressure sensor on the earpiece flex',
+          model: 'iPhone 13 (iPhone14,5)',
+          tag: 'Verified',
+          reason: 'PRS0 stopped reporting temperature to the thermal monitor in time, so the phone restarts after about three minutes.',
+          steps: [
+            'Disconnect the earpiece assembly (Face ID, proximity, earpiece speaker) and see whether the 3-minute restart stops.',
+            'Measure the 1.8 V rail feeding the pressure sensor.',
+            'Try a known-good earpiece flex.'
+          ]
+        },
+        ja: {
+          suspect: 'イヤースピーカー側フレックスの気圧センサーPRS0',
+          model: 'iPhone 13 (iPhone14,5)',
+          tag: '検証済み',
+          reason: 'PRS0がサーマルモニターへ時間内に温度を報告せず、約3分ごとに再起動します。',
+          steps: [
+            'イヤースピーカー周りのアセンブリ（Face ID・近接センサー・受話スピーカー）を外し、3分再起動が止まるか確認。',
+            '気圧センサーへの1.8V電源ラインを測定。',
+            '正常なイヤースピーカーフレックスに交換して確認。'
+          ]
+        },
+        ko: {
+          suspect: '수화부 플렉스의 기압 센서 PRS0',
+          model: 'iPhone 13 (iPhone14,5)',
+          tag: '검증됨',
+          reason: 'PRS0이 서멀 모니터에 제때 온도를 보고하지 않아 약 3분마다 재시동됩니다.',
+          steps: [
+            '수화부 어셈블리(Face ID, 근접 센서, 수화 스피커)를 분리하고 3분 재시동이 멈추는지 봅니다.',
+            '기압 센서에 공급되는 1.8V 라인을 측정합니다.',
+            '정상 수화부 플렉스로 교체해 확인합니다.'
+          ]
         }
       }
     },
+
     sample3: {
-      name: "iPhone 14 Pro - SPI Sensor Timeout",
-      device: "iPhone 14 Pro (iPhone15,2)",
-      text: `{"bug_type":"210","timestamp":"2026-10-18 14:02:11.00 +0700","os_version":"iPhone OS 17.6"}
+      file: 'panic-full-2026-10-18-140211.ips',
+      match: /spi0|compass|accel/i,
+      nets: ['SPI0_MOSI', 'SPI0_MISO', 'SPI0_CLK', 'SPI0_CS'],
+      text: `{"bug_type":"210","timestamp":"2026-10-18 14:02:11.00 +0700","os_version":"iPhone OS 17.6 (21G79)"}
 {
   "build" : "iPhone OS 17.6 (21G79)",
   "product" : "iPhone15,2",
@@ -111,476 +136,412 @@
 }`,
       result: {
         vi: {
-          suspect: "Cảm biến la bàn / Gia tốc kế SPI0 & IC Nguồn phụ",
-          confidence: "89% (Cao)",
-          device: "iPhone 14 Pro (A2650 / A2890)",
-          reason: "Giao tiếp SPI0 với cảm biến chuyển động bị gián đoạn, sai Device ID do thiếu áp hoặc hở chân.",
-          evidence: "spi0::sensor_comm_timeout compass/accel device id mismatch",
-          safeSteps: "1. Kiểm tra máy có tiền sử rơi va đập khiến hở chân IC la bàn/gia tốc.\\n2. Đo trở kháng các đường SPI0_MOSI, MISO, CLK, CS.\\n3. Khò làm lại chân hoặc thay thế IC cảm biến chuyển động."
-        },
-        ja: {
-          suspect: "SPI0 コンパス/加速度センサー & 周辺電源回路",
-          confidence: "89% (高い)",
-          device: "iPhone 14 Pro (iPhone15,2)",
-          reason: "SPI0バス上のモーションセンサー通信障害。デバイスIDの不一致または給電遮断。",
-          evidence: "spi0::sensor_comm_timeout compass/accel device id mismatch",
-          safeSteps: "1. 落下衝撃によるセンサーICのハンダクラックの可能性を調査。\\n2. SPI0_MOSI / MISO / CLK / CS ラインの導通・抵抗値を測定。\\n3. コンパス/ジャイロICのリボールまたは交換を実施。"
-        },
-        ko: {
-          suspect: "SPI0 나침반 / 가속도 센서 및 보조 전원 회로",
-          confidence: "89% (높음)",
-          device: "iPhone 14 Pro (iPhone15,2)",
-          reason: "모션 센서와의 SPI0 통신 타임아웃 및 Device ID 불일치 오류.",
-          evidence: "spi0::sensor_comm_timeout compass/accel device id mismatch",
-          safeSteps: "1. 충격으로 인한 나침반/자이로 센서 냉납 여부 육안 및 현미경 점검.\\n2. SPI0_MOSI, MISO, CLK 라인 다이오드값 측정.\\n3. 모션 센서 IC 리볼링 또는 교체 진행."
+          suspect: 'IC la bàn / gia tốc kế trên bus SPI0',
+          model: 'iPhone 14 Pro (iPhone15,2)',
+          tag: 'Độ tin cậy cao',
+          reason: 'Giao tiếp SPI0 với cảm biến chuyển động bị ngắt và đọc sai Device ID, thường do thiếu áp hoặc hở chân.',
+          steps: [
+            'Hỏi khách máy có bị rơi không; va đập dễ làm hở chân IC la bàn, gia tốc.',
+            'Đo trở kháng các đường SPI0_MOSI, MISO, CLK và CS.',
+            'Làm lại chân hoặc thay IC cảm biến chuyển động.'
+          ]
         },
         en: {
-          suspect: "SPI0 Compass / Accelerometer Sensor & Power Rails",
-          confidence: "89% (High)",
-          device: "iPhone 14 Pro (iPhone15,2)",
-          reason: "SPI0 communication timeout with motion sensor and device ID mismatch.",
-          evidence: "spi0::sensor_comm_timeout compass/accel device id mismatch",
-          safeSteps: "1. Inspect for drop damage causing cold solder joints under compass/gyro IC.\\n2. Measure diode impedance on SPI0_MOSI, MISO, CLK lines.\\n3. Reball or replace motion sensor IC."
+          suspect: 'Compass / accelerometer IC on the SPI0 bus',
+          model: 'iPhone 14 Pro (iPhone15,2)',
+          tag: 'High confidence',
+          reason: 'SPI0 communication with the motion sensor timed out and returned the wrong device ID, usually a missing rail or a cracked joint.',
+          steps: [
+            'Ask whether the phone was dropped; impacts often crack the joints under the compass or accelerometer.',
+            'Measure resistance on SPI0_MOSI, MISO, CLK and CS.',
+            'Reball or replace the motion sensor IC.'
+          ]
+        },
+        ja: {
+          suspect: 'SPI0バス上のコンパス／加速度センサーIC',
+          model: 'iPhone 14 Pro (iPhone15,2)',
+          tag: '信頼度：高',
+          reason: 'モーションセンサーとのSPI0通信がタイムアウトし、デバイスIDが一致しません。電源不足かハンダクラックが一般的な原因です。',
+          steps: [
+            '落下歴を確認。衝撃でコンパスや加速度センサーのハンダが割れることがあります。',
+            'SPI0_MOSI、MISO、CLK、CSの抵抗値を測定。',
+            'モーションセンサーICをリボールまたは交換。'
+          ]
+        },
+        ko: {
+          suspect: 'SPI0 버스의 나침반 / 가속도 센서 IC',
+          model: 'iPhone 14 Pro (iPhone15,2)',
+          tag: '신뢰도 높음',
+          reason: '모션 센서와의 SPI0 통신이 시간 초과되고 Device ID가 맞지 않습니다. 보통 전원 누락이나 냉납이 원인입니다.',
+          steps: [
+            '낙하 이력을 확인합니다. 충격으로 나침반·가속도 센서 납땜이 깨지기 쉽습니다.',
+            'SPI0_MOSI, MISO, CLK, CS 라인 저항을 측정합니다.',
+            '모션 센서 IC를 리볼링하거나 교체합니다.'
+          ]
         }
       }
     }
   };
 
-  // --- Multi-language Translations Dictionary for Page Elements ---
-  const TRANSLATIONS = {
+  // ---------- page text ----------
+  const T = {
     vi: {
-      nav_features: "Tính năng",
-      nav_demo: "Demo trực tiếp",
-      nav_how: "Cách sử dụng",
-      nav_db: "Kho phần cứng",
-      nav_faq: "Hỏi đáp",
-      nav_privacy: "Quyền riêng tư",
-      nav_download: "Tải ứng dụng",
-      hero_badge: "Phiên bản 1.0.0 cho iOS 17 & 18 • Hỗ trợ iPhone 11 - 16 Pro Max",
-      hero_title: "Chẩn Đoán Lỗi Phần Cứng iPhone Từ <span class=\"gradient-text\">Log Panic Full</span> Trong 3 Giây",
-      hero_sub: "Công cụ đắc lực dành cho kỹ thuật viên sửa chữa điện thoại. Tự động khoanh vùng IC lỗi, cảm biến chập áp và hiển thị quy trình đo đạc an toàn không cần đục main.",
-      hero_btn_appstore: "Tải trên App Store",
-      hero_btn_demo: "Thử Nghiệm Demo",
-      hero_badge_offline: "Chạy ngoại tuyến 100%",
-      hero_badge_ocr: "Quét Camera OCR",
-      hero_badge_privacy: "Bảo mật chuẩn Apple",
-      demo_head_title: "Trải Nghiệm <span class=\"gradient-text\">Phân Tích Trực Tiếp</span>",
-      demo_head_sub: "Chọn một mẫu log lỗi thực tế hoặc dán log panic-full của bạn vào khung bên dưới để chạy thử bộ phân tích:",
-      demo_btn_analyze: "Phân Tích Log Ngay",
-      demo_btn_clear: "Xóa Trắng",
-      demo_sample_1: "Mẫu 1: iPhone 11 (I2C3)",
-      demo_sample_2: "Mẫu 2: iPhone 13 (PRS0)",
-      demo_sample_3: "Mẫu 3: iPhone 14 Pro (SPI)",
-      demo_analyzing: "Đang phân tích cú pháp...",
-      res_suspect_title: "Linh kiện nghi vấn hàng đầu",
-      res_evidence_title: "Dòng bằng chứng trong log",
-      res_safe_title: "Khuyến nghị kiểm tra an toàn từng bước",
-      feat_title: "Tính Năng Vượt Trội Dành Cho Thợ Sửa Chữa",
-      feat_sub: "Thiết kế chuyên sâu, giúp tiết kiệm hàng giờ đo mò mạch và giảm thiểu rủi ro đục nhầm IC.",
-      feat_1_title: "Bộ Máy Nhận Diện Luật Ngoại Tuyến",
-      feat_1_desc: "Tốc độ xử lý siêu tốc, không cần kết nối Internet. Dữ liệu lỗi được đối chiếu với cơ sở tri thức hàng ngàn ca bệnh thực tế.",
-      feat_2_title: "Camera OCR Quét Log Siêu Tốc",
-      feat_2_desc: "Chụp ảnh trực tiếp màn hình thiết bị hoặc ảnh chụp màn hình log từ khách hàng để trích xuất ký tự tức thì.",
-      feat_3_title: "Kho Bản Đồ Cảm Biến & Sơ Đồ Khối",
-      feat_3_desc: "Tra cứu vị trí chân socket, đường bus I2C/SPI, cảm biến áp kế, mic, cáp sạc, cụm loa trong trên từng dòng máy.",
-      feat_4_title: "Quản Lý Ca Sửa Chữa & Xuất Báo Cáo",
-      feat_4_desc: "Lưu trữ lịch sử chẩn đoán, ghi chú quá trình sửa chữa và xuất báo cáo PDF/ảnh chuyên nghiệp để gửi cho khách.",
-      feat_5_title: "Trợ Lý Kỹ Thuật AI Độc Lập",
-      feat_5_desc: "Cung cấp phân tích sâu về nguyên lý điện tích, đồng thời soạn sẵn lời giải thích dễ hiểu, lịch sự để thợ tư vấn khách.",
-      feat_6_title: "Bảo Vệ Quyền Riêng Tư Tối Đa",
-      feat_6_desc: "Tự động xóa sạch số Serial, IMEI, UDID cá nhân khỏi log trước khi xử lý, tuân thủ nghiêm ngặt tiêu chuẩn Apple.",
-      cta_title: "Nâng Tầm Tốc Độ Sửa Chữa Của Bạn Ngay Hôm Nay",
-      cta_sub: "Tải SoiPanic trên App Store và tạm biệt những giờ phút đọc log thủ công đau đầu.",
-      footer_copy: "© 2026 SoiPanic. Bản quyền thuộc về đội ngũ phát triển SoiPanic. Bảo lưu mọi quyền."
-    },
-    ja: {
-      nav_features: "機能",
-      nav_demo: "ライブデモ",
-      nav_how: "使い方",
-      nav_db: "ハードウェアDB",
-      nav_faq: "FAQ",
-      nav_privacy: "プライバシー",
-      nav_download: "アプリ入手",
-      hero_badge: "iOS 17 & 18対応 • iPhone 11 〜 16 Pro Max完全サポート",
-      hero_title: "iPhoneのパニックログを<span class=\"gradient-text\">3秒で精密解析</span>",
-      hero_sub: "iPhone修理技術者・基板エンジニアのための必須ツール。パニックログ（panic-full）から障害ICや不具合センサーを即座に特定し、安全な診断手順を提示します。",
-      hero_btn_appstore: "App Storeで入手",
-      hero_btn_demo: "デモを試す",
-      hero_badge_offline: "100%オフライン動作",
-      hero_badge_ocr: "カメラOCR搭載",
-      hero_badge_privacy: "個人情報保護",
-      demo_head_title: "Web上で<span class=\"gradient-text\">パニックログ解析を体験</span>",
-      demo_head_sub: "実機のパニックログサンプルを選択するか、お持ちのログを貼り付けて解析を実行してください：",
-      demo_btn_analyze: "ログを解析する",
-      demo_btn_clear: "クリア",
-      demo_sample_1: "サンプル 1: iPhone 11 (I2C3)",
-      demo_sample_2: "サンプル 2: iPhone 13 (PRS0)",
-      demo_sample_3: "サンプル 3: iPhone 14 Pro (SPI)",
-      demo_analyzing: "構文解析中...",
-      res_suspect_title: "最も疑われる故障コンポーネント",
-      res_evidence_title: "ログ内の判定根拠行",
-      res_safe_title: "推奨される安全な切り分け手順",
-      feat_title: "修理現場のために設計されたプロ向け機能",
-      feat_sub: "回路テスターでの測定時間を大幅に短縮し、不要なIC取り外しリスクを回避します。",
-      feat_1_title: "オフライン高速ルールエンジン",
-      feat_1_desc: "インターネット接続不要。数千件に及ぶ修理実績から構築された知見データベースとミリ秒単位で照合。",
-      feat_2_title: "カメラOCRスクリーン認識",
-      feat_2_desc: "お客様から届いたログのスクリーンショットや端末画面をカメラで撮影するだけで、エラー文字列を自動抽出。",
-      feat_3_title: "ハードウェア＆センサーデータベース",
-      feat_3_desc: "iPhone/iPad各モデルのI2C/SPI通信バス、サーミスタ、マイク、気圧センサー、充電フレックスの回路配置を網羅。",
-      feat_4_title: "修理カルテ管理と診断レポート",
-      feat_4_desc: "診断結果を案件ごとに端末情報とともに保存。お客様への説明用レポートを簡単出力・共有可能。",
-      feat_5_title: "AI技術アシスタント",
-      feat_5_desc: "技術者向けの回路理論解説に加え、お客様への分かりやすい故障説明トークスクリプトを自動生成。",
-      feat_6_title: "厳格なプライバシー保護",
-      feat_6_desc: "ログ内のシリアル番号、IMEI、UDIDなどの個体識別情報を自動で安全にマスキング処理します。",
-      cta_title: "今すぐ修理ワークフローを加速させましょう",
-      cta_sub: "App StoreからSoiPanicをダウンロードして、ログ解読の負担から解放されましょう。",
-      footer_copy: "© 2026 SoiPanic. All rights reserved."
-    },
-    ko: {
-      nav_features: "주요 기능",
-      nav_demo: "체험 데모",
-      nav_how: "사용 방법",
-      nav_db: "하드웨어 DB",
-      nav_faq: "자주 묻는 질문",
-      nav_privacy: "개인정보처리방침",
-      nav_download: "앱 다운로드",
-      hero_badge: "iOS 17 & 18 지원 • iPhone 11 ~ 16 Pro Max 완벽 지원",
-      hero_title: "iPhone 패닉 로그를 <span class=\"gradient-text\">3초 만에 정밀 진단</span>",
-      hero_sub: "스마트폰 수리 기사와 보드 엔지니어를 위한 필수 솔루션. 복잡한 panic-full 로그에서 고장 원인 부품을 즉시 좁히고 단계별 점검 절차를 안내합니다.",
-      hero_btn_appstore: "App Store 다운로드",
-      hero_btn_demo: "데모 실행하기",
-      hero_badge_offline: "100% 오프라인 작동",
-      hero_badge_ocr: "스마트 OCR 인식",
-      hero_badge_privacy: "철저한 보안",
-      demo_head_title: "온라인에서 <span class=\"gradient-text\">패닉 로그 분석 체험</span>",
-      demo_head_sub: "실제 고장 샘플을 선택하거나 직접 로그를 붙여넣어 진단 결과를 확인해보세요:",
-      demo_btn_analyze: "로그 즉시 분석",
-      demo_btn_clear: "지우기",
-      demo_sample_1: "샘플 1: iPhone 11 (I2C3)",
-      demo_sample_2: "샘플 2: iPhone 13 (PRS0)",
-      demo_sample_3: "샘플 3: iPhone 14 Pro (SPI)",
-      demo_analyzing: "로그 구문 분석 중...",
-      res_suspect_title: "가장 유력한 고장 의심 부품",
-      res_evidence_title: "로그 내 판정 근거 라인",
-      res_safe_title: "권장되는 단계별 안전 점검 가이드",
-      feat_title: "스마트폰 수리 현장을 위한 강력한 핵심 기능",
-      feat_sub: "수리 시간과 테스터 실측 단계를 획기적으로 줄여 불필요한 메인보드 칩셋 분리를 방지합니다.",
-      feat_1_title: "오프라인 고속 규칙 엔진",
-      feat_1_desc: "인터넷 없이도 즉각 동작. 수천 건의 실제 수리 케이스를 기반으로 축적된 고장 지식 룰셋 매칭.",
-      feat_2_title: "카메라 OCR 스마트 캡처",
-      feat_2_desc: "손님이 보내온 패닉 캡처 화면이나 기기 화면을 카메라로 비추기만 하면 텍스트를 즉시 자동 추출.",
-      feat_3_title: "하드웨어 센서 & 통신 버스 DB",
-      feat_3_desc: "기종별 I2C/SPI 버스 구성, 온도 센서(NTC), 수화부 케이블, 독 커넥터 회로 위치 정보 제공.",
-      feat_4_title: "수리 케이스 관리 & 보고서 내보내기",
-      feat_4_desc: "진단 결과를 기기 정보와 함께 기록하여 보관하고, 고객 안내용 진단서를 손쉽게 공유.",
-      feat_5_title: "AI 기술 진단 어시스턴트",
-      feat_5_desc: "엔지니어를 위한 회로적 원인 분석 코멘트와 고객 응대용 요약 설명을 맞춤형으로 제공.",
-      feat_6_title: "철저한 프라이버시 보호",
-      feat_6_desc: "단말기 시리얼, IMEI, UDID 등 민감한 개인 식별 정보를 단말 내에서 사전 마스킹 처리.",
-      cta_title: "오늘부터 수리 효율을 극대화하세요",
-      cta_sub: "App Store에서 SoiPanic을 다운로드하고 수리 진단의 새로운 경험을 시작하세요.",
-      footer_copy: "© 2026 SoiPanic. All rights reserved."
+      skip: 'Bỏ qua, tới nội dung',
+      nav_demo: 'Dùng thử', nav_app: 'Trong ứng dụng', nav_log: 'Lấy log', nav_support: 'Hỗ trợ',
+      hero_title: 'Dán log panic-full, xem linh kiện nào cần kiểm tra trước.',
+      hero_sub: 'SoiPanic đọc nhật ký sập nguồn của iPhone, chỉ ra dòng gây lỗi, khoanh vùng cáp hoặc IC nghi vấn và gợi ý thứ tự kiểm tra, từ tháo cáp tới đo trở kháng, trước khi phải đụng vào main.',
+      store_small: 'Tải về trên',
+      hero_fine: 'Cho iPhone 11 đến iPhone 16 Pro Max. Phân tích chạy ngay trên máy, không cần mạng.',
+      demo_tab_paste: 'Dán log của bạn',
+      demo_input_label: 'Nội dung log panic-full',
+      demo_placeholder: 'Dán toàn bộ nội dung tệp panic-full (.ips) vào đây',
+      demo_analyze: 'Phân tích',
+      demo_edit: 'Sửa log',
+      demo_your_log: 'log-cua-ban.ips',
+      demo_foot: 'Bản demo trên web chỉ nhận ra ba mẫu lỗi này. Ứng dụng có bộ luật cho từng dòng máy, chip A13 đến A18.',
+      diag_src: 'Căn cứ: <b>dòng {n}</b> trong log',
+      diag_steps: 'Kiểm tra theo thứ tự',
+      diag_none: 'Bản demo trên web không nhận ra lỗi trong log này. Nó chỉ biết ba mẫu ở trên; ứng dụng có bộ luật đầy đủ.',
+      diag_cta: 'Tải ứng dụng',
+      diag_empty: 'Dán log vào ô bên trái rồi bấm Phân tích.',
+      app_title: 'Trong ứng dụng',
+      shot1_t: 'Soi log', shot1_d: 'Dán log, mở tệp .ips, chụp ảnh màn hình log hoặc gõ mã lỗi. Ứng dụng tự nhận dòng máy.',
+      shot2_t: 'Kết quả', shot2_d: 'Các giả thuyết xếp theo khả năng, kèm đường tín hiệu trên sơ đồ và quy trình kiểm tra an toàn.',
+      shot3_t: 'Phần cứng', shot3_d: 'Tách mã bitmask của SMC panic, ví dụ 0x208000, thành từng linh kiện theo thế hệ chip.',
+      shot4_t: 'Sổ tay', shot4_d: 'Mỗi ca một trang: máy nào, nghi gì, đã thay gì, đang sửa hay đã xong.',
+      notes_title: 'Nên biết trước khi cài',
+      n1_t: 'Không cần mạng để phân tích', n1_d: 'Bộ luật và dữ liệu linh kiện nằm sẵn trong máy. Soi log ngay tại bàn sửa, kể cả khi không có Wi‑Fi.',
+      n2_t: 'Thông tin của khách được ẩn', n2_d: 'Serial, IMEI, UDID và ECID bị xóa khỏi log trước khi hiển thị hay lưu lại.',
+      n3_t: 'Giải thích bằng AI là tùy chọn', n3_d: 'Chỉ chạy khi bạn bấm hỏi và đồng ý. Khi đó dòng máy, mã lỗi và tối đa 300 ký tự log đã ẩn thông tin được gửi đi. Tắt hẳn được trong Cài đặt.',
+      n4_t: 'Vẫn phải đo trước khi khò', n4_d: 'SoiPanic khoanh vùng dựa trên log. Hãy xác nhận bằng đồng hồ đo và kính hiển vi trước khi tháo IC.',
+      n5_t: 'Dòng máy hỗ trợ', n5_d: 'iPhone 11 đến iPhone 16 Pro Max, chip A13 Bionic đến A18 Pro.',
+      n6_t: 'Bốn ngôn ngữ', n6_d: 'Tiếng Việt, English, 日本語 và 한국어. Tên tín hiệu và mã lỗi giữ nguyên như trên sơ đồ.',
+      log_title: 'Lấy tệp panic-full trên máy khách',
+      log_intro: 'Mỗi lần iPhone tự khởi động lại vì lỗi phần cứng, iOS ghi lại một tệp panic-full. Đây là cách tìm nó.',
+      log_s1: 'Mở <b>Cài đặt</b>, vào <b>Quyền riêng tư &amp; Bảo mật</b>.',
+      log_s2: 'Cuộn xuống cuối, chọn <b>Phân tích &amp; Cải tiến</b>, rồi <b>Dữ liệu phân tích</b>.',
+      log_s3: 'Gõ <code>panic-full</code> vào ô tìm kiếm.',
+      log_s4: 'Chọn tệp có giờ gần nhất với lần máy sập nguồn.',
+      log_s5: 'Bấm Chia sẻ để gửi tệp qua AirDrop hoặc Zalo, hoặc sao chép toàn bộ nội dung.',
+      log_s6: 'Mở tệp bằng SoiPanic, hoặc dán nội dung vào màn hình Soi log.',
+      close_text: 'Có trên App Store cho iPhone và iPad.',
+      foot_support: 'Hỗ trợ', foot_privacy: 'Quyền riêng tư'
     },
     en: {
-      nav_features: "Features",
-      nav_demo: "Live Demo",
-      nav_how: "How It Works",
-      nav_db: "Hardware DB",
-      nav_faq: "FAQ",
-      nav_privacy: "Privacy Policy",
-      nav_download: "Download App",
-      hero_badge: "v1.0.0 for iOS 17 & 18 • iPhone 11 to 16 Pro Max Support",
-      hero_title: "Diagnose iPhone Hardware from <span class=\"gradient-text\">Panic Logs</span> in 3 Seconds",
-      hero_sub: "The ultimate diagnostic companion for mobile repair technicians. Pinpoint faulty ICs, sensor bus shorts, and view safe step-by-step checks without unnecessary desoldering.",
-      hero_btn_appstore: "Download on App Store",
-      hero_btn_demo: "Try Live Demo",
-      hero_badge_offline: "100% Offline Engine",
-      hero_badge_ocr: "Camera OCR Scanner",
-      hero_badge_privacy: "Apple-grade Privacy",
-      demo_head_title: "Experience <span class=\"gradient-text\">Live Panic Analyzer</span>",
-      demo_head_sub: "Pick a real-world panic log sample or paste your own kernel panic below to run the analyzer:",
-      demo_btn_analyze: "Analyze Panic Log",
-      demo_btn_clear: "Clear",
-      demo_sample_1: "Sample 1: iPhone 11 (I2C3)",
-      demo_sample_2: "Sample 2: iPhone 13 (PRS0)",
-      demo_sample_3: "Sample 3: iPhone 14 Pro (SPI)",
-      demo_analyzing: "Parsing log syntax...",
-      res_suspect_title: "Primary Suspect Component",
-      res_evidence_title: "Extracted Evidence Line",
-      res_safe_title: "Recommended Safe Check Steps",
-      feat_title: "Built For Mobile Repair Technicians",
-      feat_sub: "Save hours of blind multimeter probing and avoid damaging healthy ICs.",
-      feat_1_title: "Instant Offline Rule Engine",
-      feat_1_desc: "Lightning-fast processing with zero internet connection needed. Evaluates thousands of real-world repair patterns.",
-      feat_2_title: "Camera OCR Log Scanner",
-      feat_2_desc: "Capture photos of client panic logs directly from device screens to extract error strings in milliseconds.",
-      feat_3_title: "Hardware DB & Sensor Schematics",
-      feat_3_desc: "Lookup I2C/SPI lines, NTC thermistors, barometers, dock connectors, and earpiece flex pins across models.",
-      feat_4_title: "Repair Case Tracker & Export",
-      feat_4_desc: "Organize client diagnostic logs into structured cases and export shareable diagnostic summaries.",
-      feat_5_title: "AI Technical Assistant",
-      feat_5_desc: "Deep engineering breakdown plus customer-friendly explanations ready for front-desk client communication.",
-      feat_6_title: "Local Privacy By Design",
-      feat_6_desc: "Automatically strips Serial Numbers, IMEIs, and device UDIDs before analysis right on your device.",
-      cta_title: "Supercharge Your Repair Workflow Today",
-      cta_sub: "Download SoiPanic on the App Store and eliminate guesswork from iOS panic logs.",
-      footer_copy: "© 2026 SoiPanic. All rights reserved."
+      skip: 'Skip to content',
+      nav_demo: 'Try it', nav_app: 'In the app', nav_log: 'Get the log', nav_support: 'Support',
+      hero_title: 'Paste a panic-full log. See which part to check first.',
+      hero_sub: 'SoiPanic reads an iPhone crash log, points to the line that caused the panic, narrows it down to the flex cable or IC most likely at fault, and gives you an order of checks, from unplugging a cable to measuring resistance, before you touch the board.',
+      store_small: 'Download on the',
+      hero_fine: 'For iPhone 11 through iPhone 16 Pro Max. Analysis runs on the device, no internet needed.',
+      demo_tab_paste: 'Paste your own log',
+      demo_input_label: 'panic-full log contents',
+      demo_placeholder: 'Paste the full contents of a panic-full (.ips) file here',
+      demo_analyze: 'Analyze',
+      demo_edit: 'Edit log',
+      demo_your_log: 'your-log.ips',
+      demo_foot: 'This web demo only recognizes these three faults. The app has rules for every model from A13 to A18.',
+      diag_src: 'Based on <b>line {n}</b> of the log',
+      diag_steps: 'Check in this order',
+      diag_none: 'The web demo doesn’t recognize the fault in this log. It only knows the three samples above; the app has the full rule set.',
+      diag_cta: 'Get the app',
+      diag_empty: 'Paste a log on the left, then press Analyze.',
+      app_title: 'In the app',
+      shot1_t: 'Read a log', shot1_d: 'Paste a log, open an .ips file, photograph a log on screen, or type an error code. The model is detected for you.',
+      shot2_t: 'Results', shot2_d: 'Hypotheses ranked by likelihood, with the schematic signal lines and a safe order of checks.',
+      shot3_t: 'Hardware', shot3_d: 'Splits an SMC panic bitmask such as 0x208000 into individual parts, per chip generation.',
+      shot4_t: 'Case notebook', shot4_d: 'One page per repair: which phone, what you suspected, what you replaced, in progress or done.',
+      notes_title: 'Good to know before installing',
+      n1_t: 'No internet needed to analyze', n1_d: 'The rules and parts data live on the device. Read logs at the bench, even without Wi‑Fi.',
+      n2_t: 'Customer details are hidden', n2_d: 'Serial, IMEI, UDID and ECID are stripped from the log before it is shown or saved.',
+      n3_t: 'AI explanations are optional', n3_d: 'They only run when you ask and agree. The model, error code and up to 300 characters of the redacted log are sent. You can turn it off in Settings.',
+      n4_t: 'Still measure before you heat', n4_d: 'SoiPanic narrows things down from the log. Confirm with a multimeter and microscope before removing any IC.',
+      n5_t: 'Supported models', n5_d: 'iPhone 11 through iPhone 16 Pro Max, A13 Bionic to A18 Pro.',
+      n6_t: 'Four languages', n6_d: 'Tiếng Việt, English, 日本語 and 한국어. Signal names and error codes stay as they appear on the schematic.',
+      log_title: 'Getting panic-full off a customer’s phone',
+      log_intro: 'Every time an iPhone restarts because of a hardware fault, iOS writes a panic-full file. Here is where to find it.',
+      log_s1: 'Open <b>Settings</b> and go to <b>Privacy &amp; Security</b>.',
+      log_s2: 'Scroll to the bottom, tap <b>Analytics &amp; Improvements</b>, then <b>Analytics Data</b>.',
+      log_s3: 'Type <code>panic-full</code> into the search field.',
+      log_s4: 'Pick the file whose time is closest to when the phone went down.',
+      log_s5: 'Use Share to send it over AirDrop or a messaging app, or copy the full text.',
+      log_s6: 'Open the file with SoiPanic, or paste the text into the Read log screen.',
+      close_text: 'On the App Store for iPhone and iPad.',
+      foot_support: 'Support', foot_privacy: 'Privacy'
+    },
+    ja: {
+      skip: '本文へスキップ',
+      nav_demo: '試す', nav_app: 'アプリの中身', nav_log: 'ログの取り方', nav_support: 'サポート',
+      hero_title: 'panic-fullログを貼るだけで、先に点検すべき部品がわかる。',
+      hero_sub: 'SoiPanicはiPhoneのクラッシュログを読み、パニックの原因となった行を示し、疑わしいフレックスケーブルやICを絞り込みます。ケーブルの取り外しから抵抗値の測定まで、基板に手を入れる前の点検順も提示します。',
+      store_small: 'ダウンロード',
+      hero_fine: 'iPhone 11〜iPhone 16 Pro Maxに対応。解析は端末内で行い、ネット接続は不要です。',
+      demo_tab_paste: '自分のログを貼る',
+      demo_input_label: 'panic-fullログの内容',
+      demo_placeholder: 'panic-full（.ips）ファイルの内容をすべてここに貼り付けてください',
+      demo_analyze: '解析する',
+      demo_edit: 'ログを編集',
+      demo_your_log: 'your-log.ips',
+      demo_foot: 'このWebデモが認識できるのは上の3例だけです。アプリにはA13〜A18の全機種向けルールが入っています。',
+      diag_src: 'ログの<b>{n}行目</b>に基づく',
+      diag_steps: '点検の順番',
+      diag_none: 'このWebデモでは、このログの障害を認識できませんでした。認識できるのは上の3例だけで、アプリには完全なルールが入っています。',
+      diag_cta: 'アプリを入手',
+      diag_empty: '左にログを貼り付けて「解析する」を押してください。',
+      app_title: 'アプリの中身',
+      shot1_t: 'ログ解析', shot1_d: 'ログの貼り付け、.ipsファイルの読み込み、画面の撮影、エラーコードの入力に対応。機種は自動で判別します。',
+      shot2_t: '診断結果', shot2_d: '可能性の高い順に仮説を表示。回路図上の信号ラインと安全な点検手順も示します。',
+      shot3_t: 'ハードウェア', shot3_d: '0x208000のようなSMCパニックのビットマスクを、チップ世代ごとに部品単位へ分解します。',
+      shot4_t: '修理手帳', shot4_d: '1件ごとに記録：機種、疑った部品、交換した部品、作業中か完了か。',
+      notes_title: 'インストール前に知っておくこと',
+      n1_t: '解析にネット接続は不要', n1_d: 'ルールと部品データは端末内にあります。Wi‑Fiがなくても作業台ですぐ使えます。',
+      n2_t: 'お客様の情報は隠されます', n2_d: 'シリアル番号、IMEI、UDID、ECIDは表示・保存の前にログから削除されます。',
+      n3_t: 'AIによる解説は任意', n3_d: '依頼して同意したときだけ動作し、機種、エラーコード、匿名化済みログ最大300文字が送信されます。設定でオフにできます。',
+      n4_t: '加熱の前に必ず測定を', n4_d: 'SoiPanicはログから範囲を絞り込むツールです。ICを外す前にテスターと顕微鏡で確認してください。',
+      n5_t: '対応機種', n5_d: 'iPhone 11〜iPhone 16 Pro Max（A13 Bionic〜A18 Pro）。',
+      n6_t: '4つの言語', n6_d: 'Tiếng Việt、English、日本語、한국어。信号名とエラーコードは回路図の表記のままです。',
+      log_title: 'お客様の端末からpanic-fullを取り出す',
+      log_intro: 'iPhoneがハードウェア障害で再起動するたびに、iOSはpanic-fullファイルを記録します。場所は次のとおりです。',
+      log_s1: '<b>設定</b>を開き、<b>プライバシーとセキュリティ</b>へ。',
+      log_s2: '一番下までスクロールして<b>解析と改善</b>、次に<b>解析データ</b>をタップ。',
+      log_s3: '検索欄に<code>panic-full</code>と入力。',
+      log_s4: '端末が落ちた時刻に最も近いファイルを選択。',
+      log_s5: '共有からAirDropやメッセージアプリで送るか、テキストをすべてコピー。',
+      log_s6: 'SoiPanicでファイルを開くか、ログ解析画面に貼り付け。',
+      close_text: 'iPhoneとiPad向けにApp Storeで配信中。',
+      foot_support: 'サポート', foot_privacy: 'プライバシー'
+    },
+    ko: {
+      skip: '본문으로 건너뛰기',
+      nav_demo: '체험', nav_app: '앱 화면', nav_log: '로그 추출', nav_support: '지원',
+      hero_title: 'panic-full 로그를 붙여 넣으면, 먼저 점검할 부품이 보입니다.',
+      hero_sub: 'SoiPanic은 iPhone 크래시 로그를 읽어 패닉을 일으킨 줄을 짚어 주고, 의심되는 플렉스 케이블이나 IC를 좁혀 줍니다. 케이블 분리부터 저항 측정까지, 보드를 건드리기 전에 확인할 순서도 알려 줍니다.',
+      store_small: '다운로드',
+      hero_fine: 'iPhone 11부터 iPhone 16 Pro Max까지 지원. 분석은 기기 안에서 이루어지며 인터넷이 필요 없습니다.',
+      demo_tab_paste: '내 로그 붙여 넣기',
+      demo_input_label: 'panic-full 로그 내용',
+      demo_placeholder: 'panic-full(.ips) 파일 내용을 전부 여기에 붙여 넣으세요',
+      demo_analyze: '분석',
+      demo_edit: '로그 수정',
+      demo_your_log: 'your-log.ips',
+      demo_foot: '웹 데모는 위의 세 가지 고장만 인식합니다. 앱에는 A13부터 A18까지 모든 기종의 규칙이 들어 있습니다.',
+      diag_src: '로그 <b>{n}번째 줄</b> 기준',
+      diag_steps: '점검 순서',
+      diag_none: '웹 데모가 이 로그의 고장을 인식하지 못했습니다. 위의 세 가지 샘플만 알고 있으며, 앱에는 전체 규칙이 들어 있습니다.',
+      diag_cta: '앱 받기',
+      diag_empty: '왼쪽에 로그를 붙여 넣고 분석을 누르세요.',
+      app_title: '앱 화면',
+      shot1_t: '로그 분석', shot1_d: '로그 붙여 넣기, .ips 파일 열기, 화면 촬영, 오류 코드 입력을 지원합니다. 기종은 자동으로 인식합니다.',
+      shot2_t: '진단 결과', shot2_d: '가능성 순으로 정렬된 가설과 회로도상의 신호 라인, 안전한 점검 순서를 보여 줍니다.',
+      shot3_t: '하드웨어', shot3_d: '0x208000 같은 SMC 패닉 비트마스크를 칩 세대별로 부품 단위까지 나눠 줍니다.',
+      shot4_t: '수리 수첩', shot4_d: '건별로 한 페이지: 어떤 기기인지, 무엇을 의심했고 무엇을 교체했는지, 수리 중인지 완료인지.',
+      notes_title: '설치 전에 알아 둘 점',
+      n1_t: '분석에 인터넷 불필요', n1_d: '규칙과 부품 데이터가 기기에 들어 있습니다. Wi‑Fi가 없어도 작업대에서 바로 쓸 수 있습니다.',
+      n2_t: '고객 정보는 가려집니다', n2_d: '일련번호, IMEI, UDID, ECID는 표시하거나 저장하기 전에 로그에서 지워집니다.',
+      n3_t: 'AI 설명은 선택 사항', n3_d: '요청하고 동의했을 때만 작동하며, 기종, 오류 코드, 익명 처리된 로그 최대 300자가 전송됩니다. 설정에서 끌 수 있습니다.',
+      n4_t: '인두 대기 전에 반드시 측정', n4_d: 'SoiPanic은 로그로 범위를 좁혀 줄 뿐입니다. IC를 떼기 전에 테스터와 현미경으로 확인하세요.',
+      n5_t: '지원 기종', n5_d: 'iPhone 11 ~ iPhone 16 Pro Max (A13 Bionic ~ A18 Pro).',
+      n6_t: '4개 언어', n6_d: 'Tiếng Việt, English, 日本語, 한국어. 신호 이름과 오류 코드는 회로도 표기 그대로입니다.',
+      log_title: '고객 기기에서 panic-full 파일 꺼내기',
+      log_intro: 'iPhone이 하드웨어 문제로 재시동될 때마다 iOS는 panic-full 파일을 남깁니다. 찾는 방법은 다음과 같습니다.',
+      log_s1: '<b>설정</b>을 열고 <b>개인정보 보호 및 보안</b>으로 이동합니다.',
+      log_s2: '맨 아래로 내려 <b>분석 및 향상</b>, 이어서 <b>분석 데이터</b>를 누릅니다.',
+      log_s3: '검색창에 <code>panic-full</code>을 입력합니다.',
+      log_s4: '기기가 꺼진 시각과 가장 가까운 파일을 고릅니다.',
+      log_s5: '공유 버튼으로 AirDrop이나 메신저로 보내거나, 내용을 전부 복사합니다.',
+      log_s6: 'SoiPanic으로 파일을 열거나, 로그 분석 화면에 붙여 넣습니다.',
+      close_text: 'iPhone과 iPad용으로 App Store에 있습니다.',
+      foot_support: '지원', foot_privacy: '개인정보 처리방침'
     }
   };
 
-  let currentLang = 'vi';
-  let currentSampleKey = 'sample1';
+  const APP_URL = 'https://apps.apple.com/app/id6824146332';
+  let lang = 'vi';
+  let current = 'sample1';
+  let customText = '';
+  let customAnalyzed = false;
 
-  // --- Initialize UI on DOM Ready ---
+  const $ = (id) => document.getElementById(id);
+
   document.addEventListener('DOMContentLoaded', () => {
-    initLanguage();
+    lang = pickLanguage();
+    applyLanguage();
+    initLanguageSelect();
     initDemo();
-    initFAQ();
-    initMobileNav();
+    initNav();
   });
 
-  // --- Language Management ---
-  function initLanguage() {
-    // Check saved or browser language
-    const saved = localStorage.getItem('soipanic_lang');
-    if (saved && TRANSLATIONS[saved]) {
-      currentLang = saved;
-    } else {
-      const browserLang = (navigator.language || '').toLowerCase();
-      if (browserLang.startsWith('ja')) currentLang = 'ja';
-      else if (browserLang.startsWith('ko')) currentLang = 'ko';
-      else if (browserLang.startsWith('vi')) currentLang = 'vi';
-      else currentLang = 'en';
-    }
-
-    applyLanguage(currentLang);
-
-    // Language Dropdown Controls
-    const langBtn = document.getElementById('langBtn');
-    const langDropdown = document.getElementById('langDropdown');
-
-    if (langBtn && langDropdown) {
-      langBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        langDropdown.classList.toggle('show');
-      });
-
-      document.addEventListener('click', () => {
-        langDropdown.classList.remove('show');
-      });
-
-      langDropdown.querySelectorAll('button[data-lang]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const lang = btn.getAttribute('data-lang');
-          if (lang && TRANSLATIONS[lang]) {
-            currentLang = lang;
-            localStorage.setItem('soipanic_lang', lang);
-            applyLanguage(lang);
-            langDropdown.classList.remove('show');
-            // Re-render demo if active
-            runDemoAnalysis();
-          }
-        });
-      });
-    }
+  // ---------- language ----------
+  function pickLanguage() {
+    let saved = null;
+    try { saved = localStorage.getItem('soipanic_lang'); } catch (e) { /* storage blocked */ }
+    if (saved && T[saved]) return saved;
+    const nav = (navigator.language || '').toLowerCase();
+    if (nav.startsWith('vi')) return 'vi';
+    if (nav.startsWith('ja')) return 'ja';
+    if (nav.startsWith('ko')) return 'ko';
+    return 'en';
   }
 
-  function applyLanguage(lang) {
-    const t = TRANSLATIONS[lang] || TRANSLATIONS.vi;
-    
-    // Update data-i18n elements
+  function applyLanguage() {
+    const t = T[lang];
+    document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach((el) => {
-      const key = el.getAttribute('data-i18n');
-      if (t[key]) {
-        el.innerHTML = t[key];
-      }
+      const v = t[el.dataset.i18n];
+      if (v) el.innerHTML = v;
     });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+      const v = t[el.dataset.i18nPlaceholder];
+      if (v) el.placeholder = v;
+    });
+    document.querySelectorAll('img[data-shot]').forEach((img, i) => {
+      img.src = `assets/web/app-${lang}-${img.dataset.shot}.jpg`;
+      img.alt = t[`shot${i + 1}_t`] || '';
+    });
+    const sel = $('langSelect');
+    if (sel) sel.value = lang;
+  }
 
-    // Update current lang label in nav
-    const langLabel = document.getElementById('currentLangLabel');
-    if (langLabel) {
-      const flags = { vi: '🇻🇳 Tiếng Việt', ja: '🇯🇵 日本語', ko: '🇰🇷 한국어', en: '🇺🇸 English' };
-      langLabel.textContent = flags[lang] || 'Language';
-    }
-
-    // Highlight active in dropdown
-    document.querySelectorAll('.lang-dropdown button').forEach((btn) => {
-      if (btn.getAttribute('data-lang') === lang) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
+  function initLanguageSelect() {
+    const sel = $('langSelect');
+    if (!sel) return;
+    sel.addEventListener('change', () => {
+      if (!T[sel.value]) return;
+      lang = sel.value;
+      try { localStorage.setItem('soipanic_lang', lang); } catch (e) { /* ignore */ }
+      applyLanguage();
+      render(false);
     });
   }
 
-  // --- Interactive Demo Controller ---
+  // ---------- demo ----------
   function initDemo() {
-    const textarea = document.getElementById('demoInput');
-    const analyzeBtn = document.getElementById('demoAnalyzeBtn');
-    const clearBtn = document.getElementById('demoClearBtn');
-    const sampleBtns = document.querySelectorAll('.demo-pill-btn');
+    const tabs = Array.from(document.querySelectorAll('.bench-tabs [role="tab"]'));
+    if (!tabs.length) return;
 
-    if (!textarea || !analyzeBtn) return;
-
-    // Load initial sample
-    loadSample(currentSampleKey);
-
-    sampleBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        sampleBtns.forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-        const key = btn.getAttribute('data-sample');
-        if (DEMO_SAMPLES[key]) {
-          currentSampleKey = key;
-          loadSample(key);
-        }
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => selectTab(tab, tabs));
+      tab.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+        next.focus();
+        selectTab(next, tabs);
       });
+      tab.tabIndex = tab.getAttribute('aria-selected') === 'true' ? 0 : -1;
     });
 
-    analyzeBtn.addEventListener('click', () => {
-      runDemoAnalysis();
+    $('analyzeBtn').addEventListener('click', () => {
+      customText = $('logInput').value.trim();
+      if (!customText) { $('logInput').focus(); return; }
+      customAnalyzed = true;
+      render(true);
     });
 
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        textarea.value = '';
-        const output = document.getElementById('demoOutput');
-        if (output) {
-          output.innerHTML = `
-            <div style="text-align: center; color: var(--text-muted); margin: auto;">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 12px; opacity: 0.5;">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-              <p>Dán log hoặc chọn một mẫu bên trên để bắt đầu phân tích.</p>
-            </div>
-          `;
-        }
-      });
-    }
+    $('editBtn').addEventListener('click', () => {
+      customAnalyzed = false;
+      render(false);
+      $('logInput').focus();
+    });
+
+    render(false);
   }
 
-  function loadSample(key) {
-    const textarea = document.getElementById('demoInput');
-    if (textarea && DEMO_SAMPLES[key]) {
-      textarea.value = DEMO_SAMPLES[key].text;
-      runDemoAnalysis();
-    }
+  function selectTab(tab, tabs) {
+    tabs.forEach((t) => {
+      const on = t === tab;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+    });
+    current = tab.dataset.sample;
+    if (current === 'custom') customAnalyzed = false;
+    render(current !== 'custom');
+    if (current === 'custom') $('logInput').focus();
   }
 
-  function runDemoAnalysis() {
-    const textarea = document.getElementById('demoInput');
-    const output = document.getElementById('demoOutput');
-    if (!textarea || !output) return;
+  function render(flash) {
+    const t = T[lang];
+    const view = $('logView');
+    const edit = $('logEdit');
+    const editBtn = $('editBtn');
+    const diag = $('diagPane');
 
-    const content = textarea.value.trim();
-    if (!content) {
-      output.innerHTML = `<p style="color: var(--amber); text-align: center; margin: auto;">Vui lòng nhập hoặc dán nội dung panic log!</p>`;
+    if (current === 'custom' && !customAnalyzed) {
+      view.hidden = true;
+      edit.hidden = false;
+      editBtn.hidden = true;
+      $('logFile').textContent = t.demo_your_log;
+      $('logInput').value = customText;
+      diag.innerHTML = `<p class="diag-empty">${t.diag_empty}</p>`;
       return;
     }
 
-    // Match sample or inspect keywords
-    let match = DEMO_SAMPLES[currentSampleKey].result[currentLang];
+    const text = current === 'custom' ? customText : SAMPLES[current].text;
+    const key = current === 'custom' ? detect(text) : current;
+    const lines = text.split(/\r?\n/);
+    const faultIdx = key ? lines.findIndex((l) => SAMPLES[key].match.test(l)) : -1;
 
-    // Simple heuristic parser for custom pasted logs
-    if (content.includes('i2c3') || content.includes('sdb') || content.includes('SDB')) {
-      match = DEMO_SAMPLES.sample1.result[currentLang];
-    } else if (content.includes('prs0') || content.includes('Thermal monitor')) {
-      match = DEMO_SAMPLES.sample2.result[currentLang];
-    } else if (content.includes('spi0') || content.includes('compass') || content.includes('accel')) {
-      match = DEMO_SAMPLES.sample3.result[currentLang];
+    $('logFile').textContent = current === 'custom' ? t.demo_your_log : SAMPLES[current].file;
+    edit.hidden = true;
+    editBtn.hidden = current !== 'custom';
+    view.hidden = false;
+
+    view.textContent = '';
+    lines.forEach((line, i) => {
+      const li = document.createElement('li');
+      li.textContent = line || ' ';
+      if (i === faultIdx) li.className = flash ? 'is-fault flash' : 'is-fault';
+      view.appendChild(li);
+    });
+
+    if (!key) {
+      diag.innerHTML = `<p class="diag-empty">${t.diag_none} <a href="${APP_URL}" target="_blank" rel="noopener">${t.diag_cta}</a></p>`;
+      return;
     }
 
-    const t = TRANSLATIONS[currentLang] || TRANSLATIONS.vi;
+    const r = SAMPLES[key].result[lang];
+    const nets = SAMPLES[key].nets.map((n) => `<span>${n}</span>`).join('');
+    const steps = r.steps.map((s) => `<li>${s}</li>`).join('');
+    const src = faultIdx >= 0 ? `<p class="diag-src">${t.diag_src.replace('{n}', faultIdx + 1)}</p>` : '';
 
-    // Render result card with smooth appearance
-    output.innerHTML = `
-      <div class="result-card">
-        <div class="result-header">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.2rem;">⚡</span>
-            <strong style="color: #fff; font-size: 1.05rem;">${match.suspect}</strong>
-          </div>
-          <span class="badge-confidence">${match.confidence}</span>
-        </div>
-        
-        <div style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">
-          ${match.reason}
-        </div>
-
-        <div>
-          <div style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--cyan); margin-bottom: 6px; font-weight: 700;">
-            ${t.res_evidence_title}
-          </div>
-          <div style="background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 8px; font-family: var(--font-mono); font-size: 0.78rem; color: var(--cyan); border-left: 3px solid var(--cyan);">
-            ${match.evidence}
-          </div>
-        </div>
-
-        <div class="safe-check-box">
-          <div style="font-weight: 700; color: #fff; font-size: 0.82rem; margin-bottom: 4px;">
-            ${t.res_safe_title}:
-          </div>
-          <div style="color: #cbd5e1; font-size: 0.82rem; white-space: pre-line; line-height: 1.5;">
-            ${match.safeSteps}
-          </div>
-        </div>
+    diag.innerHTML = `
+      ${src}
+      <div>
+        <h3>${r.suspect}</h3>
+        <p class="diag-model">${r.model}</p>
+        <span class="diag-tag">${r.tag}</span>
       </div>
-    `;
+      <p class="diag-reason">${r.reason}</p>
+      <div class="nets">${nets}</div>
+      <div class="diag-steps">
+        <h4>${t.diag_steps}</h4>
+        <ol>${steps}</ol>
+      </div>`;
+
+    if (faultIdx >= 0) {
+      const li = view.children[faultIdx];
+      // keep the marked line in view inside the log pane only
+      view.scrollTop = Math.max(0, li.offsetTop - view.clientHeight / 3);
+    }
   }
 
-  // --- FAQ Accordions ---
-  function initFAQ() {
-    const faqItems = document.querySelectorAll('.faq-item');
-    faqItems.forEach((item) => {
-      const btn = item.querySelector('.faq-question');
-      if (btn) {
-        btn.addEventListener('click', () => {
-          const isActive = item.classList.contains('active');
-          // Close all others
-          faqItems.forEach((other) => {
-            other.classList.remove('active');
-            const ans = other.querySelector('.faq-answer');
-            if (ans) ans.style.maxHeight = null;
-          });
+  function detect(text) {
+    return Object.keys(SAMPLES).find((k) => SAMPLES[k].match.test(text)) || null;
+  }
 
-          if (!isActive) {
-            item.classList.add('active');
-            const answer = item.querySelector('.faq-answer');
-            if (answer) {
-              answer.style.maxHeight = answer.scrollHeight + 30 + 'px';
-            }
-          }
-        });
+  // ---------- mobile nav ----------
+  function initNav() {
+    const btn = $('navToggle');
+    const nav = $('siteNav');
+    if (!btn || !nav) return;
+    btn.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+    nav.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A') {
+        nav.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
       }
     });
   }
-
-  // --- Mobile Navigation ---
-  function initMobileNav() {
-    const toggle = document.querySelector('.mobile-toggle');
-    const navLinks = document.querySelector('.nav-links');
-
-    if (toggle && navLinks) {
-      toggle.addEventListener('click', () => {
-        if (navLinks.style.display === 'flex') {
-          navLinks.style.display = 'none';
-        } else {
-          navLinks.style.display = 'flex';
-          navLinks.style.flexDirection = 'column';
-          navLinks.style.position = 'absolute';
-          navLinks.style.top = '72px';
-          navLinks.style.left = '0';
-          navLinks.style.right = '0';
-          navLinks.style.background = 'rgba(7, 10, 18, 0.98)';
-          navLinks.style.padding = '24px';
-          navLinks.style.borderBottom = '1px solid var(--border-glass)';
-        }
-      });
-    }
-  }
-
 })();

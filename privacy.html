@@ -11,103 +11,56 @@
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/web/apple-touch-icon.png">
+  <meta name="theme-color" content="#EEF1F1">
   
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
-  <style>
-    .lang-tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      border-bottom: 1px solid var(--border-glass);
-      padding-bottom: 14px;
-    }
-    .lang-tab-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-glass);
-      color: var(--text-secondary);
-      padding: 8px 16px;
-      border-radius: var(--radius-full);
-      font-size: 0.88rem;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-    .lang-tab-btn:hover, .lang-tab-btn.active {
-      background: rgba(0, 240, 255, 0.15);
-      border-color: var(--cyan);
-      color: var(--text-primary);
-    }
-    .policy-content-section {
-      display: none;
-    }
-    .policy-content-section.active {
-      display: block;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
 </head>
 <body>
 
-  <!-- Ambient Light Effects -->
-  <div class="ambient-glow-1"></div>
-  <div class="ambient-glow-2"></div>
-  <div class="ambient-grid"></div>
+  <a class="skip" href="#main">Bỏ qua, tới nội dung</a>
 
-  <!-- Site Header -->
   <header class="site-header">
-    <div class="container navbar">
-      <a href="index.html" class="brand-logo">
-        <img src="assets/app_icon.png" alt="SoiPanic Logo" class="brand-icon">
-        <span>Soi<span class="gradient-text">Panic</span></span>
+    <div class="wrap bar">
+      <a href="index.html" class="brand">
+        <img src="assets/web/icon-128.png" alt="" width="32" height="32">
+        <span>SoiPanic</span>
       </a>
-
-      <nav>
-        <ul class="nav-links">
-          <li><a href="index.html#features">Tính năng</a></li>
-          <li><a href="index.html#demo">Demo trực tiếp</a></li>
-          <li><a href="support.html">Hỗ trợ kỹ thuật</a></li>
-          <li><a href="privacy.html" class="active">Quyền riêng tư</a></li>
-        </ul>
+      <nav class="nav" id="siteNav" aria-label="Chính">
+        <a href="index.html#demo">Dùng thử</a>
+        <a href="index.html#get-log">Lấy log</a>
+        <a href="support.html">Hỗ trợ</a>
+        <a href="privacy.html" aria-current="page">Quyền riêng tư</a>
       </nav>
-
-      <div class="nav-actions">
-        <a href="index.html" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.88rem;">
-          ← Quay lại Trang chủ
-        </a>
+      <div class="bar-end">
+        <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="siteNav">
+          <span class="sr-only">Menu</span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="container">
-    <article class="legal-container">
-      <div class="legal-header">
-        <h1>Chính Sách Quyền Riêng Tư</h1>
-        <p>Cập nhật lần cuối: 10 tháng 11 năm 2026 • Phiên bản 1.0.0</p>
-      </div>
+  <main id="main" class="doc">
+    <h1>Chính sách quyền riêng tư</h1>
+    <p class="lede">Cập nhật lần cuối: 10 tháng 11 năm 2026, Phiên bản 1.0.0</p>
 
-      <!-- Language Switcher Tabs for App Review & Global Users -->
-      <div class="lang-tabs">
-        <button class="lang-tab-btn active" onclick="switchPolicyTab('vi')">🇻🇳 Tiếng Việt</button>
-        <button class="lang-tab-btn" onclick="switchPolicyTab('ja')">🇯🇵 日本語</button>
-        <button class="lang-tab-btn" onclick="switchPolicyTab('ko')">🇰🇷 한국어</button>
-        <button class="lang-tab-btn" onclick="switchPolicyTab('en')">🇺🇸 English</button>
-      </div>
+    <div class="tabs" role="tablist" aria-label="Ngôn ngữ / Language">
+      <button role="tab" data-policy="vi" aria-selected="true">Tiếng Việt</button>
+      <button role="tab" data-policy="ja" aria-selected="false">日本語</button>
+      <button role="tab" data-policy="ko" aria-selected="false">한국어</button>
+      <button role="tab" data-policy="en" aria-selected="false">English</button>
+    </div>
 
-      <div class="legal-body">
 
         <!-- Vietnamese Version -->
-        <div id="policy-vi" class="policy-content-section active">
+        <div id="policy-vi" class="policy" lang="vi">
           <p>
             Chào mừng bạn đến với <strong>SoiPanic</strong> ("chúng tôi", "ứng dụng"). Chúng tôi cam kết bảo vệ quyền riêng tư và dữ liệu cá nhân của người dùng cũng như khách hàng của bạn. Chính sách này giải thích cách thức ứng dụng xử lý dữ liệu khi bạn sử dụng dịch vụ chẩn đoán nhật ký lỗi trên iOS.
           </p>
@@ -158,13 +111,13 @@
             Nếu bạn có bất kỳ thắc mắc hoặc yêu cầu nào liên quan đến chính sách quyền riêng tư này, vui lòng liên hệ qua email:
           </p>
           <p>
-            📧 <strong>Email hỗ trợ:</strong> <a href="mailto:daovansonbg@gmail.com" style="color: var(--cyan);">daovansonbg@gmail.com</a><br>
-            🌐 <strong>Kho mã nguồn:</strong> <a href="https://github.com/app-works-247/soipanic" target="_blank" rel="noopener" style="color: var(--cyan);">github.com/app-works-247/soipanic</a>
+            <strong>Email hỗ trợ:</strong> <a href="mailto:daovansonbg@gmail.com">daovansonbg@gmail.com</a><br>
+            <strong>Kho mã nguồn:</strong> <a href="https://github.com/app-works-247/soipanic" target="_blank" rel="noopener">github.com/app-works-247/soipanic</a>
           </p>
         </div>
 
         <!-- Japanese Version -->
-        <div id="policy-ja" class="policy-content-section">
+        <div id="policy-ja" class="policy" lang="ja" hidden>
           <p>
             <strong>SoiPanic</strong>（以下「本アプリ」）は、ユーザーおよびエンドユーザーのプライバシー保護を最優先事項として設計されています。本プライバシーポリシーでは、本アプリがどのようにデータを処理するかをご説明します。
           </p>
@@ -197,12 +150,12 @@
           <h2>5. お問い合わせ</h2>
           <p>
             プライバシーに関するお問い合わせは、下記までご連絡ください。<br>
-            📧 Eメール：<a href="mailto:daovansonbg@gmail.com" style="color: var(--cyan);">daovansonbg@gmail.com</a>
+            Eメール：<a href="mailto:daovansonbg@gmail.com">daovansonbg@gmail.com</a>
           </p>
         </div>
 
         <!-- Korean Version -->
-        <div id="policy-ko" class="policy-content-section">
+        <div id="policy-ko" class="policy" lang="ko" hidden>
           <p>
             <strong>SoiPanic</strong>(이하 "본 앱")은 사용자의 개인정보와 고객 데이터를 소중히 보호하며, Apple의 App Store 개인정보 보호 가이드라인을 철저히 준수합니다.
           </p>
@@ -230,12 +183,12 @@
           <h2>4. 문의처</h2>
           <p>
             개인정보 보호와 관련된 문의사항은 아래 연락처로 문의해 주시기 바랍니다.<br>
-            📧 이메일: <a href="mailto:daovansonbg@gmail.com" style="color: var(--cyan);">daovansonbg@gmail.com</a>
+            이메일: <a href="mailto:daovansonbg@gmail.com">daovansonbg@gmail.com</a>
           </p>
         </div>
 
         <!-- English Version -->
-        <div id="policy-en" class="policy-content-section">
+        <div id="policy-en" class="policy" lang="en" hidden>
           <p>
             Welcome to <strong>SoiPanic</strong> ("we", "our", or "the App"). We are committed to protecting user privacy and ensuring transparent data practices in compliance with Apple App Store Review Guideline 5.1.1.
           </p>
@@ -269,31 +222,42 @@
           <h2>5. Contact Information</h2>
           <p>
             If you have questions regarding this Privacy Policy, please contact us at:<br>
-            📧 Email: <a href="mailto:daovansonbg@gmail.com" style="color: var(--cyan);">daovansonbg@gmail.com</a>
+            Email: <a href="mailto:daovansonbg@gmail.com">daovansonbg@gmail.com</a>
           </p>
         </div>
 
-      </div>
-    </article>
   </main>
 
   <footer class="site-footer">
-    <div class="container" style="text-align: center;">
-      <p style="color: var(--text-muted); font-size: 0.9rem;">
-        © 2026 SoiPanic. All rights reserved. • <a href="index.html" style="color: var(--cyan);">Trang chủ</a> • <a href="support.html" style="color: var(--cyan);">Hỗ trợ</a>
-      </p>
+    <div class="wrap foot">
+      <p>© 2026 SoiPanic</p>
+      <nav aria-label="Liên kết phụ">
+        <a href="index.html">Trang chủ</a>
+        <a href="support.html">Hỗ trợ</a>
+        <a href="privacy.html">Quyền riêng tư</a>
+        <a href="mailto:daovansonbg@gmail.com">daovansonbg@gmail.com</a>
+      </nav>
     </div>
   </footer>
 
   <script>
-    function switchPolicyTab(lang) {
-      document.querySelectorAll('.lang-tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.policy-content-section').forEach(sec => sec.classList.remove('active'));
-
-      event.target.classList.add('active');
-      const targetSec = document.getElementById('policy-' + lang);
-      if (targetSec) targetSec.classList.add('active');
-    }
+    (function () {
+      var b = document.getElementById('navToggle'), n = document.getElementById('siteNav');
+      b.addEventListener('click', function () { b.setAttribute('aria-expanded', String(n.classList.toggle('open'))); });
+    })();
+    (function () {
+      var tabs = document.querySelectorAll('[data-policy]');
+      function show(lang) {
+        tabs.forEach(function (t) { t.setAttribute('aria-selected', String(t.dataset.policy === lang)); });
+        document.querySelectorAll('.policy').forEach(function (sec) { sec.hidden = sec.id !== 'policy-' + lang; });
+      }
+      tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.dataset.policy); }); });
+      var saved = null;
+      try { saved = localStorage.getItem('soipanic_lang'); } catch (e) {}
+      var nav = (navigator.language || '').slice(0, 2);
+      var pick = saved || (['vi', 'ja', 'ko'].indexOf(nav) >= 0 ? nav : (nav ? 'en' : 'vi'));
+      if (document.getElementById('policy-' + pick)) show(pick);
+    })();
   </script>
 </body>
 </html>
